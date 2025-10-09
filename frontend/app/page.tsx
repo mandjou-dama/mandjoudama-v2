@@ -8,17 +8,24 @@ import NowPlaying from "./components/NowPlaying";
 import Location from "./components/Location";
 
 const projects = [
-  // {
-  //   title: "13",
-  //   date: "May 2025",
-  //   status: "Current",
-  //   stacks: ["React Native", "Expo", "Supabase"],
-  //   link: "https://mandjoudama.com",
-  // },
+  {
+    title: "Treize",
+    date: "May 2025",
+    status: "Current",
+    stacks: [
+      "React Native",
+      "Expo",
+      "Supabase",
+      "Cloudflare",
+      "Node.js",
+      "Tanstack Query",
+    ],
+    link: "https://github.com/mandjou-dama/treize.git",
+  },
   {
     title: "O-Bambu App",
     date: "March 2025",
-    status: "Current",
+    status: "Done",
     stacks: ["React Native", "Expo", "Supabase"],
     link: "https://apps.apple.com/ml/app/o-bambu/id6746059635",
   },
@@ -82,7 +89,7 @@ const projects = [
 
 const experiences = [
   {
-    employer: "Freelancer",
+    employer: "Yoboo Labs",
     role: "Mobile & Frontend Developper",
     date: "Current",
   },
@@ -109,6 +116,8 @@ const stacks = [
   "Next.js",
   "Vercel",
   "Supabase",
+  "Tanstack Query",
+  "Cloudflare",
   "Sanity.io",
   "Figma",
   "Typescript",
