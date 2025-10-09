@@ -1,21 +1,44 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 type Props = {};
 
 export default function Location(props: Props) {
-  const now = new Date();
-  const date = now.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  const time = now.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  const [time, setTime] = useState("");
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+      setTime(timeString);
+    };
+
+    const updateDate = () => {
+      const now = new Date();
+      const dateString = now.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      setDate(dateString);
+    };
+
+    updateTime();
+    updateDate();
+    const timeInterval = setInterval(updateTime, 1000);
+    const dateInterval = setInterval(updateDate, 1000 * 60); // Update date every minute
+    return () => {
+      clearInterval(timeInterval);
+      clearInterval(dateInterval);
+    };
+  }, []);
 
   console.log(time.slice(0, 2));
 
