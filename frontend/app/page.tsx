@@ -1,3 +1,4 @@
+//@ts-ignore
 import "./page.scss";
 
 import Link from "next/link";
@@ -135,7 +136,7 @@ export default async function Page() {
         </div>
 
         <p className={"description"}>
-          I’m a mobile and front-end developer, passionate about everything
+          I&apos;m a mobile and front-end developer, passionate about everything
           related to software development. I enjoy crafting modern, seamless
           user interfaces while also exploring the more technical aspects of
           development, both on the client and server sides.
