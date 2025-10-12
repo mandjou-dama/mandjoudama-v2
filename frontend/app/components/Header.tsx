@@ -41,7 +41,7 @@ export default async function Header() {
       </div> */}
       <Link
         target="_blank"
-        href="https://svmdxqmzergcmclzyigz.supabase.co/storage/v1/object/public/files//Mandjou%20Dama%20-%20CV.pdf"
+        href="https://xmymttluoieutmeorcjb.supabase.co/storage/v1/object/public/personal/Mandjou%20Dama%20-%20CV.pdf"
         className={styles.theme_switchers}
       >
         <p>Resume</p>
