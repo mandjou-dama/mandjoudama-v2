@@ -20,7 +20,7 @@ const projects = [
       "Node.js",
       "Tanstack Query",
     ],
-    link: "https://github.com/mandjou-dama/treize.git",
+    link: "https://github.com/mandjou-dama/treize-preview.git",
   },
   {
     title: "O-Bambu App",
