@@ -51,6 +51,13 @@ const projects = [
     link: "https://www.bamakoartgallery.com/en",
   },
   {
+    title: "Kori Pay",
+    date: "Octobre 2024",
+    status: "Done",
+    stacks: ["Figma", "React Native", "Typescript", "Expo"],
+    link: "https://apps.apple.com/gb/app/kori-pay/id6738018013",
+  },
+  {
     title: "Kabakoo - App",
     date: "September 2024",
     status: "Done",
@@ -78,29 +85,27 @@ const projects = [
     stacks: ["Next.js", "Sanity.io"],
     link: "https://coolfaces.vercel.app/",
   },
-  // {
-  //   title: "Ikazic",
-  //   date: "March 2023",
-  //   status: "Done",
-  //   stacks: ["Next.js"],
-  //   link: "https://ikazic.vercel.app/",
-  // },
 ];
 
 const experiences = [
   {
-    employer: "Yoboo Labs",
+    employer: "Kori Inc",
     role: "Mobile & Frontend Developper",
     date: "Current",
   },
   {
+    employer: "Freelancer",
+    role: "Mobile & Frontend Developer",
+    date: "2024-2025",
+  },
+  {
     employer: "Kabakoo Academies",
-    role: "UX / UI Designer",
+    role: "Mobile & Frontend Developer",
     date: "2022-2024",
   },
   {
-    employer: "Freelancer",
-    role: "Frontend Developper",
+    employer: "Kabakoo Academies",
+    role: "UX / UI Designer",
     date: "2021-2022",
   },
   {
@@ -115,11 +120,19 @@ const stacks = [
   "Expo",
   "Next.js",
   "Vercel",
+  "Node.js",
   "Supabase",
   "Tanstack Query",
   "Cloudflare",
+  "Xcode",
+  "Android Studio",
+  "Push Notifications",
+  "Analytics",
+  "Crash Reporting",
+  "EAS",
   "Sanity.io",
   "Figma",
+  "Webflow",
   "Typescript",
   "SCSS",
   "CSS",
@@ -145,10 +158,11 @@ export default async function Page() {
         </div>
 
         <p className={"description"}>
-          I&apos;m a mobile and front-end developer, passionate about everything
-          related to software development. I enjoy crafting modern, seamless
-          user interfaces while also exploring the more technical aspects of
-          development, both on the client and server sides.
+          Mobile & Frontend Developer with over 4 years of experience building
+          responsive, accessible, and high-performance applications for mobile
+          and web. Specialized in React, React Native, TypeScript, and Next.js,
+          with a strong focus on clean code, scalable architecture, and seamless
+          user interfaces. Native in French and fluent in English.
         </p>
       </div>
 
