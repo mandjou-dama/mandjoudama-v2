@@ -23,39 +23,33 @@ const projects = [
     link: "https://github.com/mandjou-dama/treize-preview.git",
   },
   {
+    title: "Kori Pay",
+    date: "October 2024",
+    status: "Done",
+    stacks: ["Figma", "React Native", "Typescript", "Expo"],
+    link: "https://apps.apple.com/gb/app/kori-pay/id6738018013",
+  },
+  {
+    title: "Dily",
+    date: "February 2026",
+    status: "Current",
+    stacks: [
+      "React Native",
+      "Expo",
+      "React Navigation",
+      "Supabase",
+      "Cloudflare",
+      "Node.js",
+      "Tanstack Query",
+    ],
+    link: "https://github.com/mandjou-dama/dily",
+  },
+  {
     title: "O-Bambu App",
     date: "March 2025",
     status: "Done",
     stacks: ["React Native", "Expo", "Supabase"],
     link: "https://apps.apple.com/ml/app/o-bambu/id6746059635",
-  },
-  {
-    title: "O-Bambu",
-    date: "April 2025",
-    status: "Done",
-    stacks: ["Next.js", "Sanity.io"],
-    link: "https://www.o-bambu.com/",
-  },
-  {
-    title: "Yumi - Currency Converter",
-    date: "April 2025",
-    status: "Done",
-    stacks: ["React Native", "Expo"],
-    link: "https://apps.apple.com/ml/app/yumi/id6747351946",
-  },
-  {
-    title: "Bamako Art Gallery",
-    date: "February 2025",
-    status: "Done",
-    stacks: ["Next.js", "Sanity.io"],
-    link: "https://www.bamakoartgallery.com/en",
-  },
-  {
-    title: "Kori Pay",
-    date: "Octobre 2024",
-    status: "Done",
-    stacks: ["Figma", "React Native", "Typescript", "Expo"],
-    link: "https://apps.apple.com/gb/app/kori-pay/id6738018013",
   },
   {
     title: "Kabakoo - App",
@@ -65,18 +59,39 @@ const projects = [
     link: "https://apps.apple.com/ml/app/kabakoo/id6504529066",
   },
   {
+    title: "Yumi - Currency Converter",
+    date: "April 2025",
+    status: "Done",
+    stacks: ["React Native", "Expo"],
+    link: "https://apps.apple.com/ml/app/yumi/id6747351946",
+  },
+  {
+    title: "Maison Amoa",
+    date: "January 2026",
+    status: "Done",
+    stacks: ["Next.js", "Supabase"],
+    link: "https://amoa-theta.vercel.app",
+  },
+  {
+    title: "O-Bambu Website",
+    date: "April 2025",
+    status: "Done",
+    stacks: ["Next.js", "Sanity.io"],
+    link: "https://www.o-bambu.com/",
+  },
+  {
+    title: "Bamako Art Gallery",
+    date: "February 2025",
+    status: "Done",
+    stacks: ["Next.js", "Sanity.io"],
+    link: "https://www.bamakoartgallery.com/en",
+  },
+  {
     title: "Kabakoo - Website",
     date: "April 2024",
     status: "Done",
     stacks: ["Webflow", "Figma"],
     link: "https://www.kabakoo.africa/",
-  },
-  {
-    title: "Tiecoura N'Daou",
-    date: "February 2024",
-    status: "Done",
-    stacks: ["Webflow", "Figma"],
-    link: "https://tiecoura-com.webflow.io/",
   },
   {
     title: "CoolFaces",
@@ -89,9 +104,14 @@ const projects = [
 
 const experiences = [
   {
+    employer: "Payme App",
+    role: "Mobile Developper",
+    date: "Fulltime Hybrid - Current",
+  },
+  {
     employer: "Kori Inc",
     role: "Mobile & Frontend Developper",
-    date: "Current",
+    date: "Part-time - Current",
   },
   {
     employer: "Freelancer",
@@ -116,8 +136,11 @@ const experiences = [
 ];
 
 const stacks = [
+  "Typescript",
+  "Swift",
   "React Native",
   "Expo",
+  "SwiftUI",
   "Next.js",
   "Vercel",
   "Node.js",
@@ -129,11 +152,11 @@ const stacks = [
   "Push Notifications",
   "Analytics",
   "Crash Reporting",
+  "React Navigation",
   "EAS",
   "Sanity.io",
   "Figma",
   "Webflow",
-  "Typescript",
   "SCSS",
   "CSS",
 ];
