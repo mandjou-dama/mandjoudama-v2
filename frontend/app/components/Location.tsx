@@ -4,43 +4,55 @@ import React, { useEffect, useState } from "react";
 
 type Props = {};
 
+const TIME_ZONE = "Africa/Bamako";
+
+const timeFormatter = new Intl.DateTimeFormat("en-GB", {
+  timeZone: TIME_ZONE,
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
+});
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: TIME_ZONE,
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const timeMarkers = Array.from({ length: 25 }, (_, index) =>
+  String(index).padStart(2, "0"),
+);
+
 export default function Location(props: Props) {
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
+  const [currentHour, setCurrentHour] = useState("");
 
   useEffect(() => {
-    const updateTime = () => {
+    const updateLocationTime = () => {
       const now = new Date();
-      const timeString = now.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      });
-      setTime(timeString);
+      const timeParts = timeFormatter.formatToParts(now);
+      const hours = Number(
+        timeParts.find((part) => part.type === "hour")?.value ?? "0",
+      );
+      const normalizedHours = hours % 24;
+
+      setTime(timeFormatter.format(now));
+      setDate(dateFormatter.format(now));
+      setCurrentHour(String(normalizedHours).padStart(2, "0"));
     };
 
-    const updateDate = () => {
-      const now = new Date();
-      const dateString = now.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-      setDate(dateString);
-    };
+    updateLocationTime();
+    const interval = setInterval(updateLocationTime, 1000);
 
-    updateTime();
-    updateDate();
-    const timeInterval = setInterval(updateTime, 1000);
-    const dateInterval = setInterval(updateDate, 1000 * 60); // Update date every minute
-    return () => {
-      clearInterval(timeInterval);
-      clearInterval(dateInterval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
-  console.log(time.slice(0, 2));
+  const indicatorPosition = currentHour
+    ? (Number(currentHour) / (timeMarkers.length - 1)) * 100
+    : 0;
 
   return (
     <div className={"section section_5"}>
@@ -58,37 +70,15 @@ export default function Location(props: Props) {
         <p className={"hour"}>{time}</p>
 
         <div className={"timezone_bars"}>
-          {[
-            "00",
-            "01",
-            "02",
-            "03",
-            "04",
-            "05",
-            "06",
-            "07",
-            "08",
-            "09",
-            "10",
-            "11",
-            "12",
-            "13",
-            "14",
-            "15",
-            "16",
-            "17",
-            "18",
-            "19",
-            "20",
-            "21",
-            "22",
-            "23",
-          ].map((item, index) => {
-            console.log(time.slice(0, 2), item);
-
+          <span
+            aria-hidden="true"
+            className={"timezone_indicator"}
+            style={{ left: `${indicatorPosition}%` }}
+          />
+          {timeMarkers.map((item, index) => {
             return (
               <div
-                className={`${time.slice(0, 2) === item ? "active" : ""}`}
+                className={`${currentHour === item ? "active" : ""}`}
                 key={index}
               ></div>
             );
