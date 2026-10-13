@@ -1,8 +1,14 @@
-export default async function sitemap() {
-  const routes = [""].map((route) => ({
-    url: `https://mandjoudama.com${route}`,
-    lastModified: new Date().toISOString().split("T")[0],
-  }));
+import type { MetadataRoute } from "next";
 
-  return [...routes];
+import { siteConfig } from "@/lib/site";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  return [
+    {
+      url: siteConfig.url,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 1,
+    },
+  ];
 }

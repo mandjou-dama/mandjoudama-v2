@@ -1,33 +1,45 @@
 import "./globals.css";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
+import { siteConfig } from "@/lib/site";
+
+const defaultTitle = `${siteConfig.name} – ${siteConfig.jobTitle}`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mandjoudama.com"),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Mandjou Dama",
-    template: "%s | Mandjou Dama",
+    default: defaultTitle,
+    template: `%s | ${siteConfig.name}`,
   },
-  description: "Mobile & Frontend Developer",
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "technology",
+  alternates: {
+    canonical: "/",
+  },
+  // og:image and twitter:image fall back to app/opengraph-image.jpg (file convention).
   openGraph: {
-    title: "Mandjou Dama",
-    description: "Mobile & Frontend Developer",
-    url: "https://mandjoudama.com",
-    siteName: "Mandjou Dama",
-    images: [
-      {
-        url: "https://mandjoudama.com/opengraph-image.jpg",
-        width: 1200,
-        height: 600,
-      },
-    ],
-    locale: "en-US",
     type: "website",
+    url: "/",
+    siteName: siteConfig.name,
+    title: defaultTitle,
+    description: siteConfig.description,
+    locale: siteConfig.locale,
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: siteConfig.twitterHandle,
+    creator: siteConfig.twitterHandle,
+    title: defaultTitle,
+    description: siteConfig.description,
   },
   robots: {
     index: true,
@@ -43,10 +55,20 @@ export const metadata: Metadata = {
   verification: {
     google: "_PmIseyz3VvJwrGjQqJJYKHD_THMBlF7TxopDvZUOxQ",
     other: {
-      me: ["contact@mandjoudama.com", "https://mandjoudama.com"],
+      me: [siteConfig.email, siteConfig.url],
     },
   },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   referrer: "origin-when-cross-origin",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0d0d0d",
+  colorScheme: "dark",
 };
 
 const jetbrainsMono = localFont({

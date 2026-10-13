@@ -1,19 +1,22 @@
 import Link from "next/link";
 import styles from "./Footer.module.scss";
 
+import { siteConfig } from "@/lib/site";
+
 export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.links}>
-        <Link target="_blank" href="https://www.linkedin.com/in/mandjou-dama/">
-          LinkedIn
-        </Link>
-        <Link target="_blank" href="https://github.com/mandjou-dama">
-          GitHub
-        </Link>
-        <Link target="_blank" href="https://x.com/mandjou_code">
-          Twitter
-        </Link>
+        {siteConfig.socials.map(({ label, href }) => (
+          <Link
+            key={label}
+            target="_blank"
+            rel="me noopener noreferrer"
+            href={href}
+          >
+            {label}
+          </Link>
+        ))}
       </div>
 
       <p>2025 Mandjou Dama. All rights reserved.</p>

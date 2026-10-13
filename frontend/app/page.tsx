@@ -2,7 +2,8 @@
 import "./page.scss";
 
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+
+import { siteConfig } from "@/lib/site";
 
 import NowPlaying from "./components/NowPlaying";
 import Location from "./components/Location";
@@ -185,12 +186,12 @@ const projects = [
 const experiences = [
   {
     employer: "Payme App",
-    role: "Mobile Developper",
+    role: "Mobile Developer",
     date: "Fulltime Hybrid - Current",
   },
   {
     employer: "Kori Inc",
-    role: "Mobile & Frontend Developper",
+    role: "Mobile & Frontend Developer",
     date: "Part-time - Current",
   },
   {
@@ -210,7 +211,7 @@ const experiences = [
   },
   {
     employer: "Elim Communication",
-    role: "Frontend Developper",
+    role: "Frontend Developer",
     date: "2019-2021",
   },
 ];
@@ -241,19 +242,59 @@ const stacks = [
   "CSS",
 ];
 
-export default async function Page() {
-  const { data, error } = await supabase
-    .from("now_playing")
-    .select("*")
-    .eq("id", "now_playing")
-    .single();
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteConfig.url}/#website`,
+      url: siteConfig.url,
+      name: siteConfig.name,
+      description: siteConfig.description,
+      inLanguage: "en",
+      publisher: { "@id": `${siteConfig.url}/#person` },
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": `${siteConfig.url}/#profilepage`,
+      url: siteConfig.url,
+      name: `${siteConfig.name} – ${siteConfig.jobTitle}`,
+      isPartOf: { "@id": `${siteConfig.url}/#website` },
+      mainEntity: { "@id": `${siteConfig.url}/#person` },
+      inLanguage: "en",
+    },
+    {
+      "@type": "Person",
+      "@id": `${siteConfig.url}/#person`,
+      name: siteConfig.name,
+      url: siteConfig.url,
+      email: `mailto:${siteConfig.email}`,
+      jobTitle: siteConfig.jobTitle,
+      description: siteConfig.description,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: siteConfig.location.city,
+        addressCountry: siteConfig.location.countryCode,
+      },
+      knowsLanguage: ["fr", "en"],
+      knowsAbout: stacks,
+      worksFor: experiences
+        .filter(({ date }) => date.includes("Current"))
+        .map(({ employer }) => ({ "@type": "Organization", name: employer })),
+      sameAs: siteConfig.socials.map(({ href }) => href),
+    },
+  ],
+};
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
+export default function Page() {
   return (
-    <main className={"page"}>
+    <div className={"page"}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <div>
         <div className={"header"}>
           <h1>Mandjou Dama</h1>
@@ -343,7 +384,7 @@ export default async function Page() {
               <div className={"middle_dot"}></div>
               <h5>Front End</h5>
             </div>
-            <p className={"role"}>Developper</p>
+            <p className={"role"}>Developer</p>
           </div>
 
           <div className={"tech_stacks_container"}>
@@ -359,6 +400,6 @@ export default async function Page() {
 
         <Location />
       </div>
-    </main>
+    </div>
   );
 }
