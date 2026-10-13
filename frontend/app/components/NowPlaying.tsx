@@ -1,7 +1,11 @@
 "use client"; // This makes it a Client Component
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+
+const APPLE_MUSIC_ICON =
+  "https://upload.wikimedia.org/wikipedia/commons/5/5f/Apple_Music_icon.svg";
 
 type NowPlayingData = {
   id: string;
@@ -72,9 +76,14 @@ export default function NowPlaying() {
 
       {!loading ? (
         <div className="now_playing_footer">
-          <img
-            src={data?.artwork ? data?.artwork : ""}
-            alt={`${data?.title} by ${data?.artist}`}
+          <Image
+            src={data?.artwork || APPLE_MUSIC_ICON}
+            alt={
+              data?.artwork ? `${data.title} by ${data.artist}` : "Apple Music"
+            }
+            width={160}
+            height={160}
+            unoptimized
           />
           <div>
             <p>{data?.title}</p>
@@ -83,11 +92,12 @@ export default function NowPlaying() {
         </div>
       ) : (
         <div className="now_playing_footer">
-          <img
-            src={
-              "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/2048px-Apple_Music_icon.svg.png"
-            }
-            alt={`loading`}
+          <Image
+            src={APPLE_MUSIC_ICON}
+            alt="Apple Music"
+            width={160}
+            height={160}
+            unoptimized
           />
           <div>
             <p>Loading...</p>
