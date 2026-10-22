@@ -13,7 +13,7 @@
   --chip-strong: rgba(255, 255, 255, 0.1);
   --glass: rgba(10, 10, 10, 0.55);
   --accent: #f35b04;
-  --on-accent: #0a0a0a; /* white on #f35b04 is 3.3:1, too low for 14px labels; near-black is 5.9:1 */
+  --on-accent: #fff;
   --live: #4ade80;
   --music: #fa2d48;
 
