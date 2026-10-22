@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Fragment, type CSSProperties, type ReactNode } from "react";
 
 import { ArrowRight } from "@/app/components/icons";
@@ -53,7 +54,7 @@ export default function AboutPage() {
           {list(shippedFor, (brand) => (
             <span className={styles.inline}>
               <span className={styles.logo} style={{ background: brand.color, color: brand.ink ?? "#fff" }} aria-hidden="true">
-                {brand.initial}
+                {brand.logo ? <Image src={brand.logo} alt="" width={16} height={16} /> : brand.initial}
               </span>
               {brand.name}
             </span>

@@ -14,20 +14,18 @@ export const experiences: Experience[] = [
   { employer: "Elim Communication", role: "Frontend Developer", period: "2019 — 2021" },
 ];
 
-// Logo stand-ins: a coloured square with the brand's initial.
-export type Brand = { name: string; initial: string; color: string; ink?: string };
+// A brand's logo (square, in /public/images/brands), or a coloured square with its initial.
+export type Brand = { name: string; initial: string; color: string; ink?: string; logo?: string };
 
 export const heroBrands: Brand[] = [
-  { name: "Kori Pay", initial: "K", color: "#2563EB" },
-  { name: "Kabakoo", initial: "K", color: "#0E9F8E" },
-  { name: "O-Bambu", initial: "O", color: "#2E8B57" },
+  { name: "Kori Pay", initial: "K", color: "#ED2A58", logo: "/images/brands/kori-pay.png" },
+  { name: "Kabakoo", initial: "K", color: "#FFFFFF", logo: "/images/brands/kabakoo.png" },
+  { name: "O-Bambu", initial: "O", color: "#7E9E2F", logo: "/images/brands/o-bambu.png" },
 ];
 
 export const shippedFor: Brand[] = [
   { name: "Payme", initial: "P", color: "#F2683C", ink: "#0A0A0A" },
-  { name: "Kori Pay", initial: "K", color: "#2563EB" },
-  { name: "Kabakoo", initial: "K", color: "#0E9F8E" },
-  { name: "O-Bambu", initial: "O", color: "#2E8B57" },
+  ...heroBrands,
   { name: "Maison Amoa", initial: "M", color: "#8C6A4A" },
   { name: "Bamako Art Gallery", initial: "B", color: "#FAFAFA", ink: "#0A0A0A" },
 ];

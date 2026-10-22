@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 
 import { gsap, useGSAP } from "@/lib/gsap";
@@ -82,7 +83,7 @@ export function BrandRotator() {
       {heroBrands.map((brand) => (
         <span key={brand.name} className={styles.brand} data-brand="" aria-hidden="true">
           <span className={styles.logo} data-logo="" style={{ background: brand.color, color: brand.ink ?? "#fff" }}>
-            {brand.initial}
+            {brand.logo ? <Image src={brand.logo} alt="" width={18} height={18} /> : brand.initial}
           </span>
           <span>
             {[...brand.name].map((char, i) => (

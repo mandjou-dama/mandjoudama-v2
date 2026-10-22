@@ -41,10 +41,18 @@ $fine: "(hover: hover) and (pointer: fine)";
   justify-content: center;
   width: 16px;
   height: 16px;
+  overflow: hidden;
   border-radius: 4px;
   font-family: var(--font-display);
   font-size: 9px;
   font-weight: 600;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .dot {
