@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Fragment, type CSSProperties, type ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 import { ArrowRight } from "@/app/components/icons";
 import { Reveal } from "@/app/components/Reveal";
@@ -8,6 +8,7 @@ import { NowPlayingRow } from "@/app/components/work/Widgets";
 import { dailyTools, experiences, shippedFor, sideProjects } from "@/lib/profile";
 
 import styles from "./About.module.scss";
+import { PhotoRow } from "./PhotoRow";
 
 export const metadata: Metadata = {
   title: "About",
@@ -31,13 +32,6 @@ function list<T>(items: T[], render: (item: T) => ReactNode) {
     );
   });
 }
-
-const photos = [
-  { tilt: "-3deg", src: "/images/about/portrait.jpg" },
-  { tilt: "2deg", drop: "10px", src: "/images/about/portrait-studio.jpg" },
-  { tilt: "-1.5deg", src: "/images/about/portrait-sky.jpg" },
-  { tilt: "3deg", drop: "6px" },
-];
 
 export default function AboutPage() {
   return (
@@ -116,13 +110,7 @@ export default function AboutPage() {
         </div>
       </article>
 
-      <div className={styles.photos} aria-hidden="true" data-reveal="">
-        {photos.map((photo, i) => (
-          <span key={i} style={{ "--tilt": photo.tilt, "--drop": photo.drop } as CSSProperties}>
-            {photo.src ? <Image src={photo.src} alt="" fill sizes="(min-width: 760px) 180px, 25vw" /> : "[Photo]"}
-          </span>
-        ))}
-      </div>
+      <PhotoRow />
     </Reveal>
   );
 }
