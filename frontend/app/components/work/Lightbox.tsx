@@ -15,18 +15,21 @@ type Props = {
   projects: Project[];
   index: number;
   onIndexChange: (index: number) => void;
-  /** The card's device element for a project, if it is on screen: the lightbox opens from and closes to it. */
+  /** The card's picture (palette box and device) for a project: the lightbox opens from and closes into it. */
   getOrigin: (slug: string) => HTMLElement | null;
   onClose: () => void;
 };
 
 type FlipVars = { x: number; y: number; scale: number; transformOrigin: string };
 
-/** Transform that puts the lightbox's visible device exactly over the card's device. */
-function flipVars(show: HTMLElement, origin: HTMLElement | null): FlipVars | null {
-  if (!origin) return null;
-  const anchor = [...show.querySelectorAll<HTMLElement>("[data-anchor]")].find((el) => el.offsetWidth > 0);
-  const o = origin.getBoundingClientRect();
+const visibleAnchor = (show: HTMLElement) =>
+  [...show.querySelectorAll<HTMLElement>("[data-anchor]")].find((el) => el.offsetWidth > 0);
+
+/** Transform that puts the lightbox's visible device exactly over the device in the card's picture. */
+function flipVars(show: HTMLElement, media: HTMLElement | null): FlipVars | null {
+  if (!media) return null;
+  const anchor = visibleAnchor(show);
+  const o = (media.querySelector<HTMLElement>("[data-anchor]") ?? media).getBoundingClientRect();
   if (!anchor || o.width === 0 || o.bottom < 0 || o.top > window.innerHeight) return null;
   const a = anchor.getBoundingClientRect();
   const s = show.getBoundingClientRect();
@@ -38,19 +41,40 @@ function flipVars(show: HTMLElement, origin: HTMLElement | null): FlipVars | nul
   };
 }
 
+/** The morph layer's box: over the card's picture, or over the whole screen. */
+function boxOf(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  return { left: r.left, top: r.top, width: r.width, height: r.height, borderRadius: getComputedStyle(el).borderRadius };
+}
+
+/** Phones next to the anchor (other screens, the "before" phone): they only fade, they have no place in the card. */
+function extrasOf(show: HTMLElement) {
+  const anchor = visibleAnchor(show);
+  return anchor?.parentElement && anchor.parentElement !== show
+    ? [...anchor.parentElement.children].filter((el) => el !== anchor)
+    : [];
+}
+
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const showRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const morphRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const hidden = useRef<HTMLElement | null>(null);
   const closing = useRef(false);
   const swipe = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const direction = useRef(0);
   const opened = useRef(false);
 
   const project = projects[index];
+  // The top bar lags behind `index` while its text rolls out, then rolls the new project in.
+  const [headIndex, setHeadIndex] = useState(index);
+  const rolledIn = useRef(index);
+  const head = projects[headIndex];
   // The visible screen on phones; resets when the project changes.
   const [screenOf, setScreenOf] = useState({ slug: project.slug, screen: 0 });
   const screen = screenOf.slug === project.slug ? screenOf.screen : 0;
@@ -58,17 +82,31 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
   const isCompare = project.preview === "compare" && !!project.before;
   const screens = isCompare ? 2 : slides.length;
 
-  // Open: the backdrop fades in and the device flies from the card into place.
+  // The card stays empty while its picture is "in" the lightbox, so there is only ever one of it.
+  function hideOrigin(media: HTMLElement | null) {
+    if (hidden.current) hidden.current.style.visibility = "";
+    hidden.current = media;
+    if (media) media.style.visibility = "hidden";
+  }
+
+  // Open (shared element): the card's picture box grows over the screen and dissolves into the backdrop,
+  // while the device flies from the card into place.
   useGSAP(
     () => {
       const show = showRef.current!;
+      const morph = morphRef.current!;
       const reduce = reducedMotion();
       gsap.from("[data-lb-fade]", { opacity: 0, duration: 0.3, ease: "power2.out" });
       gsap.from("[data-lb-chrome]", { opacity: 0, y: reduce ? 0 : 10, duration: 0.4, delay: 0.12, ease: ease.out });
-      const flip = reduce ? null : flipVars(show, getOrigin(project.slug));
-      if (flip) {
+      const media = reduce ? null : getOrigin(project.slug);
+      const flip = flipVars(show, media);
+      if (flip && media) {
         gsap.set(show, { transformOrigin: flip.transformOrigin });
         gsap.from(show, { x: flip.x, y: flip.y, scale: flip.scale, duration: 0.75, ease: ease.expo, clearProps: "transform" });
+        gsap.from(extrasOf(show), { opacity: 0, duration: 0.4, delay: 0.1, ease: "power2.out" });
+        gsap.set(morph, { ...boxOf(media), opacity: 1 });
+        gsap.to(morph, { ...boxOf(rootRef.current!), duration: 0.75, ease: ease.expo });
+        gsap.to(morph, { opacity: 0, duration: 0.45, delay: 0.15, ease: "power1.inOut" });
       } else {
         gsap.from(show, { opacity: 0, scale: reduce ? 1 : 0.97, duration: 0.3, ease: ease.out });
       }
@@ -81,6 +119,7 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
   useGSAP(
     () => {
       const reduce = reducedMotion();
+      hideOrigin(reduce ? null : getOrigin(project.slug));
       if (opened.current && direction.current !== 0) {
         gsap.from(showRef.current, { opacity: 0, x: reduce ? 0 : direction.current * 32, duration: 0.4, ease: ease.out });
       }
@@ -91,19 +130,63 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
     { scope: rootRef, dependencies: [project.slug], revertOnUpdate: true },
   );
 
-  // Close: the device flies back into its card (or fades), then the lightbox unmounts.
+  // Changing project, top bar: the shown text rolls out the way the arrow points, then the current
+  // project's rolls in from the other side. Keyed on both indexes, so it always ends on the current one.
+  useGSAP(
+    () => {
+      const items = topRef.current!.querySelectorAll("[data-lb-roll]");
+      const dir = direction.current || 1;
+      if (headIndex !== index) {
+        if (reducedMotion()) setHeadIndex(index);
+        else {
+          gsap.to(items, {
+            opacity: 0,
+            y: -10 * dir,
+            duration: 0.16,
+            ease: "power2.in",
+            stagger: 0.025,
+            overwrite: true,
+            onComplete: () => setHeadIndex(index),
+          });
+        }
+      } else if (rolledIn.current !== headIndex) {
+        rolledIn.current = headIndex;
+        gsap.fromTo(
+          items,
+          { opacity: 0, y: 10 * dir },
+          { opacity: 1, y: 0, duration: 0.45, ease: ease.out, stagger: 0.04, overwrite: true },
+        );
+      } else {
+        // Back on the project still shown (arrow pressed twice quickly): undo the roll-out.
+        gsap.to(items, { opacity: 1, y: 0, duration: 0.3, ease: ease.out, overwrite: true });
+      }
+    },
+    { scope: rootRef, dependencies: [index, headIndex] },
+  );
+
+  // Close: the device flies back into its card while the picture box shrinks back around it,
+  // landing exactly on the card's picture, which then takes over (or everything fades).
   function close() {
     const root = rootRef.current;
     const show = showRef.current;
-    if (closing.current || !root || !show) return;
+    const morph = morphRef.current;
+    if (closing.current || !root || !show || !morph) return;
     closing.current = true;
-    const flip = reducedMotion() ? null : flipVars(show, getOrigin(project.slug));
-    const tl = gsap.timeline({ onComplete: onClose });
+    const media = reducedMotion() ? null : getOrigin(project.slug);
+    const flip = flipVars(show, media);
+    const tl = gsap.timeline({
+      onComplete: () => {
+        hideOrigin(null);
+        onClose();
+      },
+    });
     tl.to(root.querySelectorAll("[data-lb-chrome]"), { opacity: 0, duration: 0.18 }, 0);
-    if (flip) {
+    if (flip && media) {
       gsap.set(show, { transformOrigin: flip.transformOrigin });
       tl.to(show, { x: flip.x, y: flip.y, scale: flip.scale, duration: 0.45, ease: ease.inOut }, 0);
-      tl.to(show, { opacity: 0, duration: 0.12 }, 0.36);
+      tl.to(extrasOf(show), { opacity: 0, duration: 0.2 }, 0);
+      tl.fromTo(morph, boxOf(root), { ...boxOf(media), duration: 0.45, ease: ease.inOut }, 0);
+      tl.fromTo(morph, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0);
     } else {
       tl.to(show, { opacity: 0, scale: 0.97, duration: 0.22, ease: "power2.in" }, 0);
     }
@@ -152,6 +235,7 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
     return () => {
       document.removeEventListener("keydown", listener);
       html.style.overflow = overflow;
+      hideOrigin(null);
     };
   }, []);
 
@@ -175,7 +259,7 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
     if (screens > 1) setScreenOf({ slug: project.slug, screen: (screen + 1) % screens });
   }
 
-  const kindLabel = project.kind === "mobile" ? "Mobile app" : "Website";
+  const kindLabel = head.kind === "mobile" ? "Mobile app" : "Website";
   const hint = screens > 1 ? "Tap the screen · swipe for next project" : "Swipe for next project";
 
   let content;
@@ -244,25 +328,26 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
   return createPortal(
     <div ref={rootRef} className={styles.root} role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
       <div className={styles.backdrop} data-lb-fade="" onClick={close} />
+      <div ref={morphRef} className={styles.morph} style={{ background: project.palette.bg }} aria-hidden="true" />
       <div className={styles.panel}>
-        <header className={styles.top} data-lb-chrome="">
+        <header ref={topRef} className={styles.top} data-lb-chrome="">
           <div className={styles.heading}>
-            <div className={styles.tags}>
+            <div className={styles.tags} data-lb-roll="">
               <span className={styles.tag}>{kindLabel}</span>
               <span className={styles.counter}>
-                {index + 1} / {projects.length}
+                {headIndex + 1} / {projects.length}
               </span>
             </div>
-            <h2 id="lightbox-title" className={styles.title}>
-              {project.title}
+            <h2 id="lightbox-title" className={styles.title} data-lb-roll="">
+              {head.title}
             </h2>
-            <p className={styles.meta}>
-              {project.meta} · {project.year}
+            <p className={styles.meta} data-lb-roll="">
+              {head.meta} · {head.year}
             </p>
           </div>
           <div className={styles.actions}>
-            <CtaLink href={project.cta.href} className={[styles.cta, styles.ctaTop].join(" ")}>
-              {project.cta.label}
+            <CtaLink href={head.cta.href} className={[styles.cta, styles.ctaTop].join(" ")} data-lb-roll="">
+              {head.cta.label}
               <ArrowUpRight size={14} />
             </CtaLink>
             <button ref={closeRef} type="button" className={styles.round} onClick={close} aria-label="Close preview">

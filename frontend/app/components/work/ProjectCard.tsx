@@ -121,6 +121,7 @@ export function ProjectCard({ project, onOpen }: Props) {
         className={styles.media}
         style={mediaStyle}
         data-device={project.device}
+        data-media=""
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
       >

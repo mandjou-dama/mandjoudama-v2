@@ -113,7 +113,7 @@ export function WorkGrid({ filter }: { filter: Filter }) {
   }
 
   const getOrigin = (slug: string) =>
-    sectionRef.current?.querySelector<HTMLElement>(`[data-slug="${slug}"] [data-anchor]`) ?? null;
+    sectionRef.current?.querySelector<HTMLElement>(`[data-slug="${slug}"] [data-media]`) ?? null;
 
   const card = (item: GridItem) => (
     <GridCard
