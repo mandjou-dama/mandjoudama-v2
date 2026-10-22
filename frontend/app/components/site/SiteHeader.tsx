@@ -69,12 +69,20 @@ const socialIcons = {
 export function SiteHeader() {
   const ref = useRef<HTMLElement>(null);
 
-  // Past the first 200px the header gets its glass background and the "Get in touch" button.
+  // The glass background comes in as soon as the page moves, so nothing slides under a bare
+  // header; "Get in touch" waits until the hero's own button has scrolled away.
   useGSAP(() => {
+    const header = ref.current;
+    if (!header) return;
     ScrollTrigger.create({
-      start: 200,
+      start: 1,
       end: "max",
-      onToggle: (self) => ref.current?.classList.toggle(styles.scrolled, self.isActive),
+      onToggle: (self) => header.classList.toggle(styles.scrolled, self.isActive),
+    });
+    ScrollTrigger.create({
+      start: 280,
+      end: "max",
+      onToggle: (self) => header.classList.toggle(styles.withCta, self.isActive),
     });
   });
 

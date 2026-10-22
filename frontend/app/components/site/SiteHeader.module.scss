@@ -12,8 +12,8 @@ $fine: "(hover: hover) and (pointer: fine)";
   min-height: 88px;
   padding: 24px 40px;
   transition:
-    background-color 300ms ease,
-    backdrop-filter 300ms ease;
+    background-color 150ms ease,
+    backdrop-filter 150ms ease;
 
   &.scrolled {
     background: rgba(10, 10, 10, 0.82);
@@ -147,7 +147,7 @@ $fine: "(hover: hover) and (pointer: fine)";
     translate var(--t-ui) var(--ease-out),
     filter var(--t-hover) ease;
 
-  .scrolled & {
+  .withCta & {
     opacity: 1;
     translate: none;
     pointer-events: auto;

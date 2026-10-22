@@ -1,6 +1,7 @@
 // Mockups size everything in cqw (1% of the mockup's own width), so the same
 // markup works on a 185px card and a 600px lightbox. Base widths: phone 185px,
-// browser 323px.
+// browser 323px. cqw only works on a mockup's children: on the root itself it
+// would resolve against an outer container, or the viewport when there is none.
 
 // ---------- Phone ----------
 
@@ -248,7 +249,7 @@
   container-type: inline-size;
   position: relative;
   overflow: hidden;
-  border-radius: 3.1cqw;
+  border-radius: 12px;
   background: var(--screen);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.14),

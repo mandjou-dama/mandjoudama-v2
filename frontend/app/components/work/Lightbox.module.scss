@@ -329,6 +329,7 @@ $fine: "(hover: hover) and (pointer: fine)";
 .browser {
   width: min(100cqw, 1040px, 100cqh * 1.6);
   aspect-ratio: 16 / 10;
+  border-radius: 16px;
 
   @media #{$phone} {
     width: min(100cqw, 100cqh * 4 / 3);
