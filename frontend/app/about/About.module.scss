@@ -28,9 +28,10 @@ $fine: "(hover: hover) and (pointer: fine)";
   color: var(--muted);
 }
 
+// The name sits on the sentence's baseline; the logo or dot is centred on the line.
 .inline {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 5px;
   color: var(--ink);
 }
@@ -41,6 +42,7 @@ $fine: "(hover: hover) and (pointer: fine)";
   justify-content: center;
   width: 16px;
   height: 16px;
+  align-self: center;
   overflow: hidden;
   border-radius: 4px;
   font-family: var(--font-display);
@@ -56,6 +58,7 @@ $fine: "(hover: hover) and (pointer: fine)";
 }
 
 .dot {
+  align-self: center;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -108,7 +111,7 @@ $fine: "(hover: hover) and (pointer: fine)";
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--live);
+    background: var(--accent);
   }
 }
 
