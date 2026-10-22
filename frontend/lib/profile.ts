@@ -24,10 +24,10 @@ export const heroBrands: Brand[] = [
 ];
 
 export const shippedFor: Brand[] = [
-  { name: "Payme", initial: "P", color: "#F2683C", ink: "#0A0A0A" },
+  { name: "Payme", initial: "P", color: "#1C1C1C", logo: "/images/brands/payme.png" },
   ...heroBrands,
-  { name: "Maison Amoa", initial: "M", color: "#8C6A4A" },
-  { name: "Bamako Art Gallery", initial: "B", color: "#FAFAFA", ink: "#0A0A0A" },
+  { name: "Maison Amoa", initial: "M", color: "#2D5B41", logo: "/images/brands/maison-amoa.png" },
+  { name: "Bamako Art Gallery", initial: "B", color: "#FAFAFA", ink: "#0A0A0A", logo: "/images/brands/bamako-art-gallery.png" },
 ];
 
 export const dailyTools: { name: string; color: string }[] = [
