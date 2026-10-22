@@ -106,7 +106,7 @@ $fine: "(hover: hover) and (pointer: fine)";
 
 .primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 
   @media #{$fine} {
     &:hover {

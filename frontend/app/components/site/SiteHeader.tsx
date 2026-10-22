@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 
 import { GitHub, LinkedIn, XLogo } from "@/app/components/icons";
-import { ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { parseFilter, projectCount, type Filter } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 import { useBamakoClock } from "@/lib/useBamakoClock";
@@ -70,21 +69,20 @@ export function SiteHeader() {
   const ref = useRef<HTMLElement>(null);
 
   // The glass background comes in as soon as the page moves, so nothing slides under a bare
-  // header; "Get in touch" waits until the hero's own button has scrolled away.
-  useGSAP(() => {
+  // header; "Get in touch" waits until the hero's own button has scrolled away. A plain scroll
+  // listener rather than ScrollTrigger: a trigger ending at "max" turns inactive at the very
+  // bottom of the page, which dropped the background there.
+  useEffect(() => {
     const header = ref.current;
     if (!header) return;
-    ScrollTrigger.create({
-      start: 1,
-      end: "max",
-      onToggle: (self) => header.classList.toggle(styles.scrolled, self.isActive),
-    });
-    ScrollTrigger.create({
-      start: 280,
-      end: "max",
-      onToggle: (self) => header.classList.toggle(styles.withCta, self.isActive),
-    });
-  });
+    const update = () => {
+      header.classList.toggle(styles.scrolled, window.scrollY > 0);
+      header.classList.toggle(styles.withCta, window.scrollY > 280);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
 
   return (
     <header ref={ref} className={styles.header}>
