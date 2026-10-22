@@ -157,10 +157,12 @@ $fine: "(hover: hover) and (pointer: fine)";
   padding: 0 20px;
 
   span {
+    position: relative;
     flex: 1;
     display: flex;
     align-items: flex-end;
     aspect-ratio: 3 / 4;
+    overflow: hidden;
     padding: 12px;
     border-radius: 16px;
     background: #1a1a1c;
@@ -173,5 +175,9 @@ $fine: "(hover: hover) and (pointer: fine)";
     &:nth-child(even) {
       background: #202022;
     }
+  }
+
+  img {
+    object-fit: cover;
   }
 }

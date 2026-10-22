@@ -33,9 +33,9 @@ function list<T>(items: T[], render: (item: T) => ReactNode) {
 }
 
 const photos = [
-  { tilt: "-3deg" },
-  { tilt: "2deg", drop: "10px" },
-  { tilt: "-1.5deg" },
+  { tilt: "-3deg", src: "/images/about/portrait.jpg" },
+  { tilt: "2deg", drop: "10px", src: "/images/about/portrait-studio.jpg" },
+  { tilt: "-1.5deg", src: "/images/about/portrait-sky.jpg" },
   { tilt: "3deg", drop: "6px" },
 ];
 
@@ -119,7 +119,7 @@ export default function AboutPage() {
       <div className={styles.photos} aria-hidden="true" data-reveal="">
         {photos.map((photo, i) => (
           <span key={i} style={{ "--tilt": photo.tilt, "--drop": photo.drop } as CSSProperties}>
-            [Photo]
+            {photo.src ? <Image src={photo.src} alt="" fill sizes="(min-width: 760px) 180px, 25vw" /> : "[Photo]"}
           </span>
         ))}
       </div>
