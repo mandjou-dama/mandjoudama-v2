@@ -2,10 +2,11 @@ import "./globals.css";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
+import { Figtree, Inter } from "next/font/google";
 import localFont from "next/font/local";
 
-import Footer from "@/app/components/Footer";
-import Header from "@/app/components/Header";
+import { SiteFooter } from "@/app/components/site/SiteFooter";
+import { SiteHeader } from "@/app/components/site/SiteHeader";
 import { siteConfig } from "@/lib/site";
 
 const defaultTitle = `${siteConfig.name} – ${siteConfig.jobTitle}`;
@@ -67,30 +68,35 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0d0d",
+  themeColor: "#0a0a0a",
   colorScheme: "dark",
 };
 
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree", display: "swap" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const jetbrainsMono = localFont({
   src: "../public/fonts/JetBrainsMono-Variable.woff2",
-  variable: "--jetbrains-mono",
+  variable: "--font-jetbrains",
+  display: "swap",
 });
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Lets CSS hide what the page animates in, only once JS is known to be running.
+const jsFlag = "document.documentElement.classList.add('js')";
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      className={`${figtree.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: jsFlag }} />
+      </head>
       <body>
-        <section className="pt-24">
-          <section className="main_section">
-            <Header />
-            <main className="">{children}</main>
-            <Footer />
-          </section>
-        </section>
+        <SiteHeader />
+        <main>{children}</main>
+        <SiteFooter />
         <SpeedInsights />
       </body>
     </html>

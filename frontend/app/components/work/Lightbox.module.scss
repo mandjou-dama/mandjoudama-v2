@@ -1,0 +1,446 @@
+$phone: "(max-width: 640px)";
+$fine: "(hover: hover) and (pointer: fine)";
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  outline: none;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(24px);
+}
+
+// Empty areas let clicks through to the backdrop, which closes the lightbox.
+.panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+// ---------- Top bar ----------
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+
+  @media #{$phone} {
+    align-items: flex-start;
+    padding: 16px 16px 8px;
+  }
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+
+  @media #{$phone} {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--chip-strong);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.counter {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--subtle);
+
+  @media not #{$phone} {
+    display: none;
+  }
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media #{$phone} {
+    font-size: 24px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    white-space: normal;
+  }
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--subtle);
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--ground);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color var(--t-hover) ease,
+    transform var(--t-press) var(--ease-out);
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  @media #{$fine} {
+    &:hover {
+      background: #e5e5e5;
+    }
+  }
+}
+
+.ctaTop {
+  @media #{$phone} {
+    display: none;
+  }
+}
+
+.ctaBottom {
+  height: 48px;
+  font-size: 15px;
+
+  @media not #{$phone} {
+    display: none;
+  }
+}
+
+.round {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--chip-strong);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color var(--t-hover) ease;
+
+  @media #{$fine} {
+    &:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+  }
+
+  @media #{$phone} {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+// ---------- Stage ----------
+
+// The stage is a size container: devices are sized from the space it leaves them.
+.stage {
+  container-type: size;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 88px;
+  touch-action: pan-y;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+
+  @media #{$phone} {
+    padding: 8px 16px;
+  }
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  margin-top: -22px;
+  width: 44px;
+  height: 44px;
+
+  @media #{$phone} {
+    display: none;
+  }
+}
+
+.prev {
+  left: 24px;
+}
+
+.next {
+  right: 24px;
+}
+
+.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  height: 100%;
+  max-width: 100%;
+  min-width: 0;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--subtle);
+}
+
+// --n phones side by side, 32px apart, never wider than the stage or taller than 600px.
+.phone {
+  flex-shrink: 0;
+  width: auto;
+  height: min(100cqh, 600px, calc((100cqw - (var(--n, 1) - 1) * 32px) / var(--n, 1) * 19.5 / 9));
+}
+
+.figure .phone {
+  height: min(100cqh - 32px, 600px, calc((100cqw - (var(--n, 1) - 1) * 32px) / var(--n, 1) * 19.5 / 9));
+}
+
+.phoneRow {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+
+  @media #{$phone} {
+    display: none;
+  }
+}
+
+.phoneSingle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+
+  @media #{$phone} {
+    display: flex;
+  }
+}
+
+.phoneButton {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  text-align: left;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  .phone {
+    height: min(100cqh - 56px, 520px, calc(100cqw * 19.5 / 9));
+  }
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  span {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.3);
+    transition:
+      width 300ms var(--ease-out),
+      background-color 300ms ease;
+  }
+
+  .dotOn {
+    width: 20px;
+    background: var(--ink);
+  }
+}
+
+.browser {
+  width: min(100cqw, 1040px, 100cqh * 1.6);
+  aspect-ratio: 16 / 10;
+
+  @media #{$phone} {
+    width: min(100cqw, 100cqh * 4 / 3);
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.mediaBox {
+  position: relative;
+  height: min(100cqh, 680px);
+  max-width: 100cqw;
+  overflow: hidden;
+  border-radius: 14px;
+
+  img,
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.hint {
+  padding: 0 16px 4px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--subtle);
+
+  @media not #{$phone} {
+    display: none;
+  }
+}
+
+// ---------- Bottom ----------
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 24px 24px;
+
+  @media #{$phone} {
+    padding: 8px 16px 20px;
+  }
+}
+
+.thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  @media #{$phone} {
+    justify-content: flex-start;
+  }
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 72px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  opacity: 0.55;
+  cursor: pointer;
+  transition:
+    opacity var(--t-hover) ease,
+    box-shadow var(--t-hover) ease;
+
+  &[aria-current="true"] {
+    opacity: 1;
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+
+  @media #{$fine} {
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @media #{$phone} {
+    width: 56px;
+    height: 44px;
+  }
+}
+
+.thumbPhone {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 20px;
+  height: 44px;
+  margin-left: -10px;
+  border-radius: 6px;
+  background: var(--screen);
+  box-shadow: 0 0 0 2px #0b0b0c;
+}
+
+.thumbBrowser {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 64px;
+  height: 44px;
+  border-radius: 4px;
+  background: var(--screen);
+}

@@ -1,0 +1,269 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+
+import { CtaLink } from "@/app/components/CtaLink";
+import { ChevronsLeftRight, Expand, Pause, Play } from "@/app/components/icons";
+import { BrowserMockup, DatedPhoneMockup, PhoneMockup } from "@/app/components/mockups/Mockups";
+import { gsap, useGSAP } from "@/lib/gsap";
+import { mediaRatio, type Project } from "@/lib/projects";
+
+import styles from "./Card.module.scss";
+
+export type OpenRequest = { origin: HTMLElement; trigger: HTMLElement };
+
+type Props = {
+  project: Project;
+  onOpen?: (request: OpenRequest) => void;
+};
+
+const STEP_SECONDS = 3.2;
+
+export function ProjectCard({ project, onOpen }: Props) {
+  const rootRef = useRef<HTMLElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
+  const deviceRef = useRef<HTMLDivElement>(null);
+  const magnetRef = useRef<HTMLSpanElement>(null);
+  const soonRef = useRef<HTMLSpanElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fillRef = useRef<HTMLSpanElement>(null);
+  const follow = useRef<{ mx?: gsap.QuickToFunc; my?: gsap.QuickToFunc; sx?: gsap.QuickToFunc; sy?: gsap.QuickToFunc }>({});
+  const pageTween = useRef<gsap.core.Tween | null>(null);
+  const stepTween = useRef<gsap.core.Tween | null>(null);
+
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
+
+  const slides = project.slides ?? [{}];
+  const isCarousel = project.preview === "carousel" && slides.length > 1;
+  const isVideo = project.preview === "video";
+  const isCompare = project.preview === "compare" && !!project.before;
+  const openable = !project.soon && !isCompare;
+
+  // Pointer followers (magnet and "Coming soon") and the video preview loop.
+  useGSAP(
+    () => {
+      if (magnetRef.current) {
+        follow.current.mx = gsap.quickTo(magnetRef.current, "x", { duration: 0.45, ease: "power3.out" });
+        follow.current.my = gsap.quickTo(magnetRef.current, "y", { duration: 0.45, ease: "power3.out" });
+      }
+      if (soonRef.current && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        gsap.set(soonRef.current, { xPercent: -50, yPercent: -50 });
+        follow.current.sx = gsap.quickTo(soonRef.current, "x", { duration: 0.18, ease: "power3.out" });
+        follow.current.sy = gsap.quickTo(soonRef.current, "y", { duration: 0.18, ease: "power3.out" });
+      }
+      if (isVideo && pageRef.current) {
+        pageTween.current = gsap.to(pageRef.current, {
+          yPercent: -42,
+          duration: 6,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+          repeatDelay: 0.6,
+          paused: true,
+        });
+      }
+    },
+    { scope: rootRef },
+  );
+
+  // Carousel: the active step fills over STEP_SECONDS, then moves on.
+  useGSAP(
+    () => {
+      if (!isCarousel || !fillRef.current) return;
+      stepTween.current = gsap.fromTo(
+        fillRef.current,
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          duration: STEP_SECONDS,
+          ease: "none",
+          paused: !playing,
+          onComplete: () => setIndex((i) => (i + 1) % slides.length),
+        },
+      );
+    },
+    { scope: rootRef, dependencies: [index], revertOnUpdate: true },
+  );
+
+  useEffect(() => {
+    stepTween.current?.paused(!playing);
+    if (pageTween.current) pageTween.current.paused(!playing);
+    const video = videoRef.current;
+    if (video && isVideo) {
+      if (playing) void video.play();
+      else video.pause();
+    }
+  }, [playing, isVideo]);
+
+  function onPointerEnter(e: PointerEvent<HTMLDivElement>) {
+    if (e.pointerType !== "mouse" || !soonRef.current) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    gsap.set(soonRef.current, { x: e.clientX - r.left, y: e.clientY - r.top });
+  }
+
+  function onPointerMove(e: PointerEvent<HTMLDivElement>) {
+    if (e.pointerType !== "mouse") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const { mx, my, sx, sy } = follow.current;
+    mx?.((x - r.width / 2) * 0.3);
+    my?.((y - r.height / 2) * 0.3);
+    sx?.(x);
+    sy?.(y);
+  }
+
+  function onPointerLeave() {
+    follow.current.mx?.(0);
+    follow.current.my?.(0);
+  }
+
+  const mediaStyle = {
+    "--bg": project.palette.bg,
+    "--ratio": mediaRatio(project),
+    maxHeight: project.maxHeight,
+  } as CSSProperties;
+
+  return (
+    <article ref={rootRef} className={styles.card} data-reveal="">
+      <div
+        ref={mediaRef}
+        className={[styles.media, project.soon && styles.mediaSoon].filter(Boolean).join(" ")}
+        style={mediaStyle}
+        data-device={project.device}
+        onPointerEnter={onPointerEnter}
+        onPointerMove={onPointerMove}
+        onPointerLeave={onPointerLeave}
+      >
+        {project.media?.type === "image" ? (
+          <Image
+            src={project.media.src}
+            alt={project.media.alt}
+            fill
+            sizes="(min-width: 1200px) 25vw, (min-width: 880px) 33vw, (min-width: 560px) 50vw, 100vw"
+            className={styles.mediaFill}
+          />
+        ) : project.media?.type === "video" ? (
+          <video
+            ref={videoRef}
+            className={styles.mediaFill}
+            src={project.media.src}
+            poster={project.media.poster}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            autoPlay={!isVideo}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          />
+        ) : project.device === "browser" ? (
+          <BrowserMockup ref={deviceRef} pageRef={pageRef} project={project} className={styles.deviceBrowser} anchor />
+        ) : (
+          <PhoneMockup ref={deviceRef} project={project} slides={slides} index={index} className={styles.devicePhone} anchor />
+        )}
+
+        {isCompare && !project.media && (
+          <>
+            <div className={styles.beforeLayer}>
+              <DatedPhoneMockup project={project} className={styles.devicePhone} />
+            </div>
+            <span className={styles.divider} aria-hidden="true" />
+            <span className={[styles.tag, styles.tagBefore].join(" ")} aria-hidden="true">
+              Before
+            </span>
+            <span className={[styles.tag, styles.tagAfter].join(" ")} aria-hidden="true">
+              After
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              defaultValue={50}
+              className={styles.range}
+              aria-label={`Compare the old and new ${project.title} designs`}
+              onChange={(e) => mediaRef.current?.style.setProperty("--pos", `${e.currentTarget.value}%`)}
+            />
+            <span className={styles.handle} aria-hidden="true">
+              <ChevronsLeftRight size={16} />
+            </span>
+          </>
+        )}
+
+        {openable && (
+          <>
+            <button
+              type="button"
+              className={styles.open}
+              aria-label={`Preview ${project.title}`}
+              onClick={(e) => onOpen?.({ origin: deviceRef.current ?? mediaRef.current!, trigger: e.currentTarget })}
+            />
+            <span ref={magnetRef} className={styles.magnet} aria-hidden="true">
+              <span className={styles.magnetDot}>
+                <Expand size={20} />
+              </span>
+            </span>
+            <span className={styles.hint} aria-hidden="true">
+              <Expand size={14} />
+            </span>
+          </>
+        )}
+
+        {project.soon && (
+          <span ref={soonRef} className={styles.soon} aria-hidden="true">
+            <span className={styles.soonPill}>Coming soon</span>
+          </span>
+        )}
+      </div>
+
+      <div className={styles.label}>
+        <div className={styles.labelInner}>
+          <div className={styles.labelRow}>
+            <h3 className={styles.title}>
+              {project.title}
+              {project.soon && <span className="sr-only"> — coming soon</span>}
+            </h3>
+
+            {isCarousel && (
+              <div className={styles.stepper} role="group" aria-label={`Screen ${index + 1} of ${slides.length}`}>
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className={styles.step}
+                    aria-label={`Show screen ${i + 1}`}
+                    aria-current={i === index ? "step" : undefined}
+                    onClick={() => setIndex(i)}
+                  >
+                    <span className={styles.stepTrack}>
+                      {i === index && <span ref={fillRef} className={styles.stepFill} />}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {(isCarousel || isVideo) && (
+              <button
+                type="button"
+                className={styles.round}
+                aria-label={`${playing ? "Pause" : "Play"} ${isCarousel ? "carousel" : "preview"}`}
+                onClick={() => setPlaying((p) => !p)}
+              >
+                {playing ? <Pause /> : <Play />}
+              </button>
+            )}
+
+            {!project.soon && !isCarousel && !isVideo && (
+              <CtaLink href={project.cta.href} className={styles.pill}>
+                {project.cta.label}
+              </CtaLink>
+            )}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}

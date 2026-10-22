@@ -1,0 +1,379 @@
+// Mockups size everything in cqw (1% of the mockup's own width), so the same
+// markup works on a 185px card and a 600px lightbox. Base widths: phone 185px,
+// browser 323px.
+
+// ---------- Phone ----------
+
+.phone {
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 9 / 19.5;
+}
+
+.phoneFrame {
+  position: absolute;
+  inset: 0;
+  padding: 3.24cqw;
+  border-radius: 20.5cqw;
+  background: #0b0b0c;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 40px 80px -20px rgba(0, 0, 0, 0.7);
+}
+
+.phoneScreen {
+  position: relative;
+  height: 100%;
+  border-radius: 17.3cqw;
+  overflow: hidden;
+  background: var(--screen);
+}
+
+.island {
+  position: absolute;
+  z-index: 1;
+  top: 5.4cqw;
+  left: 34%;
+  width: 32%;
+  height: 9.2cqw;
+  border-radius: 5.4cqw;
+  background: #000;
+}
+
+.track {
+  display: flex;
+  height: 100%;
+  transition: transform 600ms var(--ease-out);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.slide {
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6.5cqw;
+  padding: 21.6cqw 7.6cqw 7.6cqw;
+}
+
+.bar {
+  display: block;
+  height: 3.24cqw;
+  border-radius: 1.6cqw;
+  background: var(--line);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+
+  span {
+    width: 14cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--line);
+
+    &:first-child {
+      background: var(--ink);
+    }
+  }
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 3.24cqw;
+
+  .bar {
+    width: 42%;
+  }
+}
+
+.appTitle {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11.35cqw;
+  line-height: 1.1;
+  letter-spacing: -0.024em;
+  color: var(--text);
+}
+
+.hero {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 3.8cqw;
+  height: var(--hero);
+  padding: 6.5cqw;
+  border-radius: 8.6cqw;
+  background: var(--ink);
+
+  span {
+    display: block;
+    width: 36%;
+    height: 3.24cqw;
+    border-radius: 1.6cqw;
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  span + span {
+    width: 62%;
+    height: 6.5cqw;
+    border-radius: 2.2cqw;
+    background: rgba(255, 255, 255, 0.92);
+  }
+}
+
+.tiles {
+  display: flex;
+  gap: 4.3cqw;
+
+  span {
+    flex: 1;
+    height: 24.9cqw;
+    border-radius: 6.5cqw;
+    background: var(--line);
+  }
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  gap: 5.4cqw;
+
+  > span:first-child {
+    flex-shrink: 0;
+    width: 16.2cqw;
+    aspect-ratio: 1;
+    border-radius: 4.9cqw;
+    background: var(--line);
+  }
+
+  > span:last-child {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2.7cqw;
+  }
+
+  .bar:first-child {
+    width: 72%;
+  }
+
+  .bar:last-child {
+    width: 44%;
+  }
+}
+
+// The "before" screen of a compare card: flatter, boxier, greyer.
+.dated {
+  display: flex;
+  flex-direction: column;
+  gap: 5.4cqw;
+  height: 100%;
+  padding: 21.6cqw 6.5cqw 6.5cqw;
+
+  .appBar {
+    height: 16.2cqw;
+    margin: 0 -6.5cqw;
+    background: var(--ink);
+  }
+
+  .datedTitle {
+    font-family: var(--font-text);
+    font-weight: 500;
+    font-size: 8.1cqw;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3.24cqw;
+    height: 37.8cqw;
+    padding: 5.4cqw;
+    border: 1px solid var(--line);
+    border-radius: 2.2cqw;
+    background: #fff;
+
+    span {
+      height: 3.24cqw;
+      width: 50%;
+      background: var(--line);
+    }
+
+    span + span {
+      height: 5.4cqw;
+      width: 70%;
+      background: var(--ink);
+    }
+  }
+
+  .button {
+    height: 18.4cqw;
+    border-radius: 2.2cqw;
+    background: var(--ink);
+  }
+
+  .rule {
+    height: 1px;
+    background: var(--line);
+  }
+
+  .lines {
+    display: flex;
+    flex-direction: column;
+    gap: 3.24cqw;
+
+    span {
+      height: 3.24cqw;
+      width: 80%;
+      background: var(--line);
+    }
+
+    span + span {
+      width: 55%;
+    }
+  }
+}
+
+// ---------- Browser ----------
+
+.browser {
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+  border-radius: 3.1cqw;
+  background: var(--screen);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 40px 80px -20px rgba(0, 0, 0, 0.7);
+}
+
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 1.9cqw;
+  height: 8cqw;
+  padding: 0 3.1cqw;
+  background: var(--chrome);
+
+  > span:not(.url) {
+    width: 2.2cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(128, 128, 128, 0.5);
+  }
+}
+
+.url {
+  margin-left: 3.7cqw;
+  padding: 0 3.1cqw;
+  border-radius: 2.3cqw;
+  background: var(--line);
+  font-family: var(--font-mono);
+  font-size: 2.8cqw;
+  line-height: 4.6cqw;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 3.7cqw;
+  padding: 5.6cqw 6.8cqw;
+  will-change: transform;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 12%;
+
+  > span {
+    width: 5.6cqw;
+    aspect-ratio: 1;
+    border-radius: 1.5cqw;
+    background: var(--ink);
+  }
+
+  div {
+    display: flex;
+    gap: 3.1cqw;
+  }
+
+  i {
+    display: block;
+    width: 8cqw;
+    height: 1.55cqw;
+    border-radius: 1cqw;
+    background: var(--line);
+  }
+}
+
+.siteTitle {
+  max-width: 70%;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 7.4cqw;
+  line-height: 1.05;
+  letter-spacing: -0.027em;
+  color: var(--text);
+}
+
+.subBar {
+  width: 46%;
+  height: 1.9cqw;
+  border-radius: 1cqw;
+  background: var(--line);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.5cqw;
+  margin-top: 1.2cqw;
+  padding-right: 10%;
+
+  span {
+    aspect-ratio: 3 / 4;
+    border-radius: 1.9cqw;
+    background: var(--line);
+
+    &:first-child {
+      background: var(--ink);
+    }
+  }
+}
+
+.sectionBar {
+  width: 58%;
+  height: 3.1cqw;
+  margin-top: 4.3cqw;
+  border-radius: 1.2cqw;
+  background: var(--line);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.5cqw;
+  padding-right: 10%;
+
+  span {
+    aspect-ratio: 4 / 3;
+    border-radius: 1.9cqw;
+    background: var(--line);
+
+    &:last-child {
+      background: var(--ink);
+    }
+  }
+}

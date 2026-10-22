@@ -1,0 +1,188 @@
+$fine: "(hover: hover) and (pointer: fine)";
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: "time nav end";
+  align-items: center;
+  gap: 16px;
+  min-height: 88px;
+  padding: 24px 40px;
+  transition:
+    background-color 300ms ease,
+    backdrop-filter 300ms ease;
+
+  &.scrolled {
+    background: rgba(10, 10, 10, 0.82);
+    backdrop-filter: blur(16px);
+  }
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "nav end";
+    min-height: 0;
+    padding: 14px var(--gutter);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "time end"
+      "nav nav";
+    row-gap: 10px;
+    padding: 12px 16px 10px;
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(16px);
+  }
+}
+
+.time {
+  grid-area: time;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+
+  @media (max-width: 960px) {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+}
+
+.relative {
+  color: var(--subtle);
+
+  @media (max-width: 640px) {
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+}
+
+.nav {
+  grid-area: nav;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+
+  @media (max-width: 960px) and (min-width: 641px) {
+    justify-content: flex-start;
+  }
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  transition:
+    background-color var(--t-hover) ease,
+    color var(--t-hover) ease;
+
+  &[aria-current] {
+    background: var(--chip-strong);
+    color: var(--ink);
+  }
+
+  @media #{$fine} {
+    &:hover {
+      color: var(--ink);
+    }
+  }
+
+  @media (max-width: 640px) {
+    height: 40px;
+    padding: 0 12px;
+  }
+}
+
+.tabCount {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--subtle);
+}
+
+.end {
+  grid-area: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+// "Get in touch" waits for the visitor to scroll past the hero (it is always there on phones).
+.cta {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  translate: 8px 0;
+  pointer-events: none;
+  transition:
+    opacity var(--t-ui) var(--ease-out),
+    translate var(--t-ui) var(--ease-out),
+    filter var(--t-hover) ease;
+
+  .scrolled & {
+    opacity: 1;
+    translate: none;
+    pointer-events: auto;
+  }
+
+  @media #{$fine} {
+    &:hover {
+      filter: brightness(1.12);
+    }
+  }
+
+  @media (max-width: 640px) {
+    opacity: 1;
+    translate: none;
+    pointer-events: auto;
+  }
+}
+
+.social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background-color var(--t-hover) ease;
+
+  @media #{$fine} {
+    &:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+  }
+
+  @media (max-width: 640px) {
+    display: none;
+  }
+}
