@@ -340,8 +340,8 @@ $fine: "(hover: hover) and (pointer: fine)";
   }
 }
 
-// "Coming soon": the outer span follows the pointer in place of the cursor (GSAP),
-// the inner pill fades in (CSS). On touch screens it sits in the top-left corner.
+// "Coming soon": magnetic like the expand button, GSAP on the outer span and CSS
+// on the inner pill. On touch screens it sits in the top-left corner.
 .soon {
   position: absolute;
   top: 12px;
@@ -350,8 +350,8 @@ $fine: "(hover: hover) and (pointer: fine)";
   pointer-events: none;
 
   @media #{$fine} {
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
   }
 }
 
@@ -373,21 +373,15 @@ $fine: "(hover: hover) and (pointer: fine)";
     padding: 0 20px;
     font-size: 16px;
     opacity: 0;
-    scale: 0.85;
+    scale: 0.6;
     transition:
       opacity 200ms ease-out,
-      scale 200ms ease-out;
+      scale 450ms var(--ease-out);
 
     .card:hover & {
       opacity: 1;
       scale: 1;
     }
-  }
-}
-
-@media #{$fine} {
-  .mediaSoon {
-    cursor: none;
   }
 }
 

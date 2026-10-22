@@ -25,11 +25,10 @@ export function ProjectCard({ project, onOpen }: Props) {
   const mediaRef = useRef<HTMLDivElement>(null);
   const deviceRef = useRef<HTMLDivElement>(null);
   const magnetRef = useRef<HTMLSpanElement>(null);
-  const soonRef = useRef<HTMLSpanElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
-  const follow = useRef<{ mx?: gsap.QuickToFunc; my?: gsap.QuickToFunc; sx?: gsap.QuickToFunc; sy?: gsap.QuickToFunc }>({});
+  const follow = useRef<{ mx?: gsap.QuickToFunc; my?: gsap.QuickToFunc }>({});
   const pageTween = useRef<gsap.core.Tween | null>(null);
   const stepTween = useRef<gsap.core.Tween | null>(null);
 
@@ -42,17 +41,16 @@ export function ProjectCard({ project, onOpen }: Props) {
   const isCompare = project.preview === "compare" && !!project.before;
   const openable = !project.soon && !isCompare;
 
-  // Pointer followers (magnet and "Coming soon") and the video preview loop.
+  // Magnet (expand button or "Coming soon" pill) and the video preview loop.
   useGSAP(
     () => {
       if (magnetRef.current) {
+        // The pill has no fixed size, so it is centred here rather than with CSS margins.
+        if (project.soon && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+          gsap.set(magnetRef.current, { xPercent: -50, yPercent: -50 });
+        }
         follow.current.mx = gsap.quickTo(magnetRef.current, "x", { duration: 0.45, ease: "power3.out" });
         follow.current.my = gsap.quickTo(magnetRef.current, "y", { duration: 0.45, ease: "power3.out" });
-      }
-      if (soonRef.current && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-        gsap.set(soonRef.current, { xPercent: -50, yPercent: -50 });
-        follow.current.sx = gsap.quickTo(soonRef.current, "x", { duration: 0.18, ease: "power3.out" });
-        follow.current.sy = gsap.quickTo(soonRef.current, "y", { duration: 0.18, ease: "power3.out" });
       }
       if (isVideo && pageRef.current) {
         pageTween.current = gsap.to(pageRef.current, {
@@ -98,22 +96,11 @@ export function ProjectCard({ project, onOpen }: Props) {
     }
   }, [playing, isVideo]);
 
-  function onPointerEnter(e: PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== "mouse" || !soonRef.current) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    gsap.set(soonRef.current, { x: e.clientX - r.left, y: e.clientY - r.top });
-  }
-
   function onPointerMove(e: PointerEvent<HTMLDivElement>) {
     if (e.pointerType !== "mouse") return;
     const r = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-    const { mx, my, sx, sy } = follow.current;
-    mx?.((x - r.width / 2) * 0.3);
-    my?.((y - r.height / 2) * 0.3);
-    sx?.(x);
-    sy?.(y);
+    follow.current.mx?.((e.clientX - r.left - r.width / 2) * 0.3);
+    follow.current.my?.((e.clientY - r.top - r.height / 2) * 0.3);
   }
 
   function onPointerLeave() {
@@ -131,10 +118,9 @@ export function ProjectCard({ project, onOpen }: Props) {
     <article ref={rootRef} className={styles.card} data-reveal="">
       <div
         ref={mediaRef}
-        className={[styles.media, project.soon && styles.mediaSoon].filter(Boolean).join(" ")}
+        className={styles.media}
         style={mediaStyle}
         data-device={project.device}
-        onPointerEnter={onPointerEnter}
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
       >
@@ -212,7 +198,7 @@ export function ProjectCard({ project, onOpen }: Props) {
         )}
 
         {project.soon && (
-          <span ref={soonRef} className={styles.soon} aria-hidden="true">
+          <span ref={magnetRef} className={styles.soon} aria-hidden="true">
             <span className={styles.soonPill}>Coming soon</span>
           </span>
         )}
