@@ -7,7 +7,7 @@ import { CtaLink } from "@/app/components/CtaLink";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Close } from "@/app/components/icons";
 import { BrowserMockup, DatedPhoneMockup, PhoneMockup } from "@/app/components/mockups/Mockups";
 import { ease, gsap, useGSAP } from "@/lib/gsap";
-import type { Project } from "@/lib/projects";
+import { pictureColor, type Project } from "@/lib/projects";
 
 import styles from "./Lightbox.module.scss";
 
@@ -55,6 +55,18 @@ function extrasOf(show: HTMLElement) {
     : [];
 }
 
+/**
+ * Dresses the morph layer as the card's picture: its background image (the card's already-loaded file)
+ * over the palette colour. Returns the picture's current hover zoom, for the morph to start from.
+ */
+function dressMorph(image: HTMLImageElement, media: HTMLElement) {
+  const background = media.querySelector<HTMLImageElement>("img[data-background]")?.currentSrc;
+  image.hidden = !background;
+  if (background) image.src = background;
+  const picture = media.querySelector<HTMLElement>("[data-picture]");
+  return (picture && parseFloat(getComputedStyle(picture).scale)) || 1;
+}
+
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }: Props) {
@@ -62,6 +74,7 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
   const showRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const morphRef = useRef<HTMLDivElement>(null);
+  const morphImageRef = useRef<HTMLImageElement>(null);
   const topRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const hidden = useRef<HTMLElement | null>(null);
@@ -105,8 +118,10 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
         gsap.from(show, { x: flip.x, y: flip.y, scale: flip.scale, duration: 0.75, ease: ease.expo, clearProps: "transform" });
         const extras = extrasOf(show);
         if (extras.length) gsap.from(extras, { opacity: 0, duration: 0.4, delay: 0.1, ease: "power2.out" });
+        const zoom = dressMorph(morphImageRef.current!, media);
         gsap.set(morph, { ...boxOf(media), opacity: 1 });
         gsap.to(morph, { ...boxOf(rootRef.current!), duration: 0.75, ease: ease.expo });
+        gsap.fromTo(morphImageRef.current, { scale: zoom }, { scale: 1, duration: 0.75, ease: ease.expo });
         gsap.to(morph, { opacity: 0, duration: 0.45, delay: 0.15, ease: "power1.inOut" });
       } else {
         gsap.from(show, { opacity: 0, scale: reduce ? 1 : 0.97, duration: 0.3, ease: ease.out });
@@ -187,6 +202,7 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
       tl.to(show, { x: flip.x, y: flip.y, scale: flip.scale, duration: 0.45, ease: ease.inOut }, 0);
       const extras = extrasOf(show);
       if (extras.length) tl.to(extras, { opacity: 0, duration: 0.2 }, 0);
+      dressMorph(morphImageRef.current!, media);
       tl.fromTo(morph, boxOf(root), { ...boxOf(media), duration: 0.45, ease: ease.inOut }, 0);
       tl.fromTo(morph, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0);
     } else {
@@ -330,7 +346,10 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
   return createPortal(
     <div ref={rootRef} className={styles.root} role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
       <div className={styles.backdrop} data-lb-fade="" onClick={close} />
-      <div ref={morphRef} className={styles.morph} style={{ background: project.palette.bg }} aria-hidden="true" />
+      <div ref={morphRef} className={styles.morph} style={{ background: pictureColor(project) }} aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element -- the card's already-loaded image, set on open and close */}
+        <img ref={morphImageRef} className={styles.morphImage} alt="" hidden />
+      </div>
       <div className={styles.panel}>
         <header ref={topRef} className={styles.top} data-lb-chrome="">
           <div className={styles.heading}>

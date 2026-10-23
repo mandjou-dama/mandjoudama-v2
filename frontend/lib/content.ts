@@ -1,5 +1,8 @@
+import path from "node:path";
+
 import { createReader } from "@keystatic/core/reader";
 import type { Node } from "@markdoc/markdoc";
+import { imageSizeFromFile } from "image-size/fromFile";
 import { cache } from "react";
 
 import keystaticConfig from "@/keystatic.config";
@@ -14,8 +17,21 @@ type Entry = Awaited<ReturnType<typeof reader.collections.projects.readOrThrow>>
 
 // Keystatic stores empty optional fields as "" or null; the site treats them as absent.
 const text = (value: string) => value || undefined;
+/** An optional size in px, stored as text; empty or 0 means none. */
+const pixels = (value: string) => Number(value) || undefined;
 
-function toProject(slug: string, e: Entry): Project {
+/** An image's size in px: the entry's values when both are set, otherwise read from the file in public/. */
+async function sizeOf(src: string, width: string, height: string) {
+  if (pixels(width) && pixels(height)) return { width: Number(width), height: Number(height) };
+  const size = await imageSizeFromFile(path.join(process.cwd(), "public", src)).catch((error: unknown) => {
+    throw new Error(`Can't read the size of ${src} (content/projects): ${error}`);
+  });
+  // EXIF orientations 5–8 are stored rotated a quarter turn.
+  const turned = (size.orientation ?? 1) >= 5;
+  return { width: turned ? size.height : size.width, height: turned ? size.width : size.height };
+}
+
+async function toProject(slug: string, e: Entry): Promise<Project> {
   const { preview, media, caseStudy } = e;
   return {
     slug,
@@ -28,18 +44,24 @@ function toProject(slug: string, e: Entry): Project {
     cta: e.cta,
     preview: preview.discriminant,
     ratio: text(e.ratio),
-    maxHeight: e.maxHeight ?? undefined,
+    maxHeight: pixels(e.maxHeight),
     soon: e.soon || undefined,
     url: text(e.url),
     palette: { ...e.palette, chrome: text(e.palette.chrome), muted: text(e.palette.muted) },
+    background: e.background ?? undefined,
     slides:
       preview.discriminant === "carousel"
-        ? preview.value.map((s) => ({ ink: text(s.ink), hero: s.hero ?? undefined }))
+        ? preview.value.map((s) => ({ ink: text(s.ink), hero: pixels(s.hero) }))
         : undefined,
     before: preview.discriminant === "compare" ? preview.value : undefined,
     media:
       media.discriminant === "image"
-        ? { type: "image", ...media.value }
+        ? {
+            type: "image",
+            src: media.value.src,
+            alt: media.value.alt,
+            ...(await sizeOf(media.value.src, media.value.width, media.value.height)),
+          }
         : media.discriminant === "video"
           ? { type: "video", src: media.value.src, poster: media.value.poster ?? undefined }
           : undefined,
@@ -60,9 +82,8 @@ const readGrid = cache(async () => (await reader.singletons.grid.readOrThrow()).
 export const getProjects = cache(async (): Promise<Project[]> => {
   const [entries, grid] = await Promise.all([reader.collections.projects.all(), readGrid()]);
   const rank = new Map(grid.flatMap((item, i) => (item.discriminant === "project" ? [[item.value, i] as const] : [])));
-  return entries
-    .map(({ slug, entry }) => toProject(slug, entry))
-    .sort((a, b) => (rank.get(a.slug) ?? Infinity) - (rank.get(b.slug) ?? Infinity) || a.title.localeCompare(b.title));
+  const projects = await Promise.all(entries.map(({ slug, entry }) => toProject(slug, entry)));
+  return projects.sort((a, b) => (rank.get(a.slug) ?? Infinity) - (rank.get(b.slug) ?? Infinity) || a.title.localeCompare(b.title));
 });
 
 export async function getProject(slug: string) {
@@ -79,12 +100,13 @@ export const getGrid = cache(async (): Promise<GridItem[]> => {
   });
 });
 
+/** Projects per filter tab. Reads the entries only (no image sizes): the layout needs it on every page, 404s included. */
 export async function getProjectCounts(): Promise<ProjectCounts> {
-  const projects = await getProjects();
+  const kinds = (await reader.collections.projects.all()).map(({ entry }) => entry.kind);
   return {
-    all: projects.length,
-    mobile: projects.filter((p) => p.kind === "mobile").length,
-    web: projects.filter((p) => p.kind === "web").length,
+    all: kinds.length,
+    mobile: kinds.filter((kind) => kind === "mobile").length,
+    web: kinds.filter((kind) => kind === "web").length,
   };
 }
 

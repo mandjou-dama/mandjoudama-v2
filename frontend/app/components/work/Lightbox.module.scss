@@ -18,8 +18,19 @@ $fine: "(hover: hover) and (pointer: fine)";
 // The card's picture box during open and close (shared element), between the backdrop and the panel.
 .morph {
   position: absolute;
+  overflow: hidden;
   opacity: 0;
   pointer-events: none;
+}
+
+.morphImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  &[hidden] {
+    display: none;
+  }
 }
 
 // Empty areas let clicks through to the backdrop, which closes the lightbox.

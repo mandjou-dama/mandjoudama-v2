@@ -18,6 +18,11 @@ const optionalColour = (label: string, description?: string) =>
     validation: { pattern: { regex: /^(#[0-9A-Fa-f]{6})?$/, message: "A hex colour, like #121C30, or empty" } },
   });
 
+// Optional sizes are text, not fields.integer: clearing Keystatic's number input leaves an invalid value
+// ("must be a whole number") instead of an empty one. lib/content.ts turns them into numbers.
+const pixels = (label: string, description: string) =>
+  fields.text({ label, description, validation: { pattern: { regex: /^(\d+)?$/, message: "A number of px, or empty" } } });
+
 const projects = collection({
   label: "Projects",
   path: "content/projects/*",
@@ -75,7 +80,7 @@ const projects = collection({
         carousel: fields.array(
           fields.object({
             ink: optionalColour("Accent", "Empty: the palette's accent."),
-            hero: fields.integer({ label: "Hero height", description: "In px at the 185px base width. Empty: the default." }),
+            hero: pixels("Hero height", "In px at the 185px base width. Empty: the default."),
           }),
           { label: "Screens", itemLabel: (props) => `Screen${props.fields.ink.value ? ` · ${props.fields.ink.value}` : ""}` },
         ),
@@ -95,10 +100,17 @@ const projects = collection({
       description: "Width / height of the card's picture, e.g. 9 / 16. Empty: 9 / 16 for phones, 387 / 290 for browsers.",
       validation: { pattern: { regex: /^(\d+ \/ \d+)?$/, message: "Like 9 / 16, or empty" } },
     }),
-    maxHeight: fields.integer({ label: "Max picture height", description: "In px; caps a tall card. Empty: no cap." }),
+    maxHeight: pixels("Max picture height", "In px; caps a tall card. Empty: no cap."),
+    background: fields.image({
+      label: "Background image",
+      description:
+        "Fills the card's picture behind the mockup (cropped to fit), like a blurred photo or a gradient. About 1200px wide. Empty: the palette's background colour.",
+      directory: "public/images/backgrounds",
+      publicPath: "/images/backgrounds/",
+    }),
     palette: fields.object(
       {
-        bg: colour("Background", "The card's picture area."),
+        bg: colour("Background", "The card's picture area, under the background image."),
         screen: colour("Screen"),
         ink: colour("Accent"),
         line: colour("Lines"),
@@ -124,8 +136,8 @@ const projects = collection({
         image: fields.object({
           src: fields.image({ label: "Image", directory: "public/work", publicPath: "/work/", validation: { isRequired: true } }),
           alt: fields.text({ label: "Alt text", validation: { isRequired: true } }),
-          width: fields.integer({ label: "Width (px)", validation: { isRequired: true } }),
-          height: fields.integer({ label: "Height (px)", validation: { isRequired: true } }),
+          width: pixels("Width (px)", "Empty: read from the image. Fill both to override."),
+          height: pixels("Height (px)", "Empty: read from the image. Fill both to override."),
         }),
         video: fields.object({
           src: fields.file({ label: "Video", directory: "public/work", publicPath: "/work/", validation: { isRequired: true } }),

@@ -45,6 +45,23 @@ $fine: "(hover: hover) and (pointer: fine)";
   object-fit: cover;
 }
 
+// The picture's content (background image, then the mockup or real media) in one layer, so it zooms as a whole.
+.picture {
+  position: absolute;
+  inset: 0;
+}
+
+// Static cards zoom their picture inside the frame on hover, like the reference site.
+.zoom {
+  transition: scale 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  @media #{$fine} and (prefers-reduced-motion: no-preference) {
+    .card:hover & {
+      scale: 1.02;
+    }
+  }
+}
+
 // Device positions inside the picture area.
 // The whole phone, centred in its frame; its width follows from the height and the
 // phone's own aspect ratio, so taller frames simply get more room around it.
@@ -54,7 +71,6 @@ $fine: "(hover: hover) and (pointer: fine)";
   left: 50%;
   height: 84%;
   transform: translate(-50%, -50%);
-  transition: translate 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .deviceBrowser {
@@ -63,19 +79,6 @@ $fine: "(hover: hover) and (pointer: fine)";
   left: 9%;
   width: 104%;
   height: 100%;
-  transition: translate 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-@media #{$fine} {
-  .card:hover :is(.devicePhone, .deviceBrowser) {
-    translate: 0 -8px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card:hover :is(.devicePhone, .deviceBrowser) {
-    translate: none;
-  }
 }
 
 // ---------- Label ----------

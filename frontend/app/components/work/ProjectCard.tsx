@@ -7,7 +7,7 @@ import { CtaLink } from "@/app/components/CtaLink";
 import { ChevronsLeftRight, Expand, Pause, Play } from "@/app/components/icons";
 import { BrowserMockup, DatedPhoneMockup, PhoneMockup } from "@/app/components/mockups/Mockups";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { mediaRatio, type Project } from "@/lib/projects";
+import { mediaRatio, pictureColor, type Project } from "@/lib/projects";
 
 import styles from "./Card.module.scss";
 
@@ -19,6 +19,7 @@ type Props = {
 };
 
 const STEP_SECONDS = 3.2;
+const SIZES = "(min-width: 1200px) 25vw, (min-width: 880px) 33vw, (min-width: 560px) 50vw, 100vw";
 
 export function ProjectCard({ project, onOpen }: Props) {
   const rootRef = useRef<HTMLElement>(null);
@@ -40,6 +41,8 @@ export function ProjectCard({ project, onOpen }: Props) {
   const isVideo = project.preview === "video";
   const isCompare = project.preview === "compare" && !!project.before;
   const openable = !project.soon && !isCompare;
+  // Like the reference, only static cards zoom their picture on hover; interactive ones keep still.
+  const zooms = project.preview === "still" && project.media?.type !== "video";
 
   // Magnet (expand button or "Coming soon" pill) and the video preview loop.
   useGSAP(
@@ -109,7 +112,7 @@ export function ProjectCard({ project, onOpen }: Props) {
   }
 
   const mediaStyle = {
-    "--bg": project.palette.bg,
+    "--bg": pictureColor(project),
     "--ratio": mediaRatio(project),
     maxHeight: project.maxHeight,
   } as CSSProperties;
@@ -125,32 +128,31 @@ export function ProjectCard({ project, onOpen }: Props) {
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
       >
-        {project.media?.type === "image" ? (
-          <Image
-            src={project.media.src}
-            alt={project.media.alt}
-            fill
-            sizes="(min-width: 1200px) 25vw, (min-width: 880px) 33vw, (min-width: 560px) 50vw, 100vw"
-            className={styles.mediaFill}
-          />
-        ) : project.media?.type === "video" ? (
-          <video
-            ref={videoRef}
-            className={styles.mediaFill}
-            src={project.media.src}
-            poster={project.media.poster}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            autoPlay={!isVideo}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-          />
-        ) : project.device === "browser" ? (
-          <BrowserMockup ref={deviceRef} pageRef={pageRef} project={project} className={styles.deviceBrowser} anchor />
-        ) : (
-          <PhoneMockup ref={deviceRef} project={project} slides={slides} index={index} className={styles.devicePhone} anchor />
-        )}
+        <div className={[styles.picture, zooms && styles.zoom].filter(Boolean).join(" ")} data-picture="">
+          {project.background && (
+            <Image src={project.background} alt="" fill sizes={SIZES} className={styles.mediaFill} data-background="" />
+          )}
+          {project.media?.type === "image" ? (
+            <Image src={project.media.src} alt={project.media.alt} fill sizes={SIZES} className={styles.mediaFill} />
+          ) : project.media?.type === "video" ? (
+            <video
+              ref={videoRef}
+              className={styles.mediaFill}
+              src={project.media.src}
+              poster={project.media.poster}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              autoPlay={!isVideo}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+            />
+          ) : project.device === "browser" ? (
+            <BrowserMockup ref={deviceRef} pageRef={pageRef} project={project} className={styles.deviceBrowser} anchor />
+          ) : (
+            <PhoneMockup ref={deviceRef} project={project} slides={slides} index={index} className={styles.devicePhone} anchor />
+          )}
+        </div>
 
         {isCompare && !project.media && (
           <>

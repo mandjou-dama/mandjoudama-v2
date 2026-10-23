@@ -58,6 +58,8 @@ export type Project = {
   soon?: boolean;
   url?: string;
   palette: Palette;
+  /** Image behind the mockup in the card's picture (object-fit: cover); palette.bg shows without it. */
+  background?: string;
   slides?: Slide[];
   before?: Pick<Palette, "screen" | "ink" | "line" | "text">;
   media?: ProjectMedia;
@@ -71,6 +73,11 @@ export type GridItem =
 export function mediaRatio(project: Project) {
   // Defaults match the reference grid: tall 9:16 phones, 387:290 landscape windows.
   return project.ratio ?? (project.device === "phone" ? "9 / 16" : "387 / 290");
+}
+
+/** The card picture's base colour: none under real media (its transparent parts show the card), the palette's otherwise. */
+export function pictureColor(project: Pick<Project, "media" | "palette">) {
+  return project.media ? "transparent" : project.palette.bg;
 }
 
 export function parseFilter(value: string | null | undefined): Filter {
