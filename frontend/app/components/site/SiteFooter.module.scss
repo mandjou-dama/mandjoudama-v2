@@ -1,0 +1,13 @@
+.footer {
+  padding: 120px var(--gutter) 36px;
+}
+
+.bar {
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--subtle);
+}

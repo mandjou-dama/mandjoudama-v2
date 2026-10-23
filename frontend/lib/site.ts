@@ -7,13 +7,19 @@ export const siteConfig = {
   email: "contact@mandjoudama.com",
   twitterHandle: "@mandjou_code",
   locale: "en_US",
+  timeZone: "Africa/Bamako",
   location: {
     city: "Bamako",
+    country: "Mali",
     countryCode: "ML",
   },
+  // Shows the "Available for new projects" pill in the hero.
+  available: false,
+  resumeUrl:
+    "https://xmymttluoieutmeorcjb.supabase.co/storage/v1/object/public/personal/Mandjou%20Dama%20-%20CV.pdf",
   socials: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/mandjou-dama/" },
     { label: "GitHub", href: "https://github.com/mandjou-dama" },
-    { label: "Twitter", href: "https://x.com/mandjou_code" },
+    { label: "X", href: "https://x.com/mandjou_code" },
   ],
 } as const;
