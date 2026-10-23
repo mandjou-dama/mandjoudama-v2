@@ -278,9 +278,16 @@ $fine: "(hover: hover) and (pointer: fine)";
   text-transform: uppercase;
 }
 
-.chapterBody {
+// Everything after a chapter's title: paragraphs, lettered lists, images.
+.chapterContent {
   flex: 1 1 480px;
   max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chapterBody {
   font-size: 20px;
   line-height: 30px;
   font-weight: 500;
@@ -289,8 +296,6 @@ $fine: "(hover: hover) and (pointer: fine)";
 }
 
 .items {
-  flex: 1 1 480px;
-  max-width: 720px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -311,6 +316,13 @@ $fine: "(hover: hover) and (pointer: fine)";
     font-size: 12px;
     color: var(--subtle);
   }
+}
+
+.storyImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-media);
 }
 
 .figures {

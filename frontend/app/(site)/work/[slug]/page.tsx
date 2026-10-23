@@ -6,20 +6,20 @@ import type { CSSProperties } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "@/app/components/icons";
 import { BrowserMockup, PhoneMockup } from "@/app/components/mockups/Mockups";
 import { Reveal } from "@/app/components/Reveal";
-import { getProject, projects, type Project } from "@/lib/projects";
+import { getCaseStudyBody, getProject, getProjects } from "@/lib/content";
+import type { Project } from "@/lib/projects";
 
 import styles from "./CaseStudy.module.scss";
+import { Story } from "./Story";
 
 export const dynamicParams = false;
 
-const withCaseStudy = projects.filter((p) => p.caseStudy);
-
-export function generateStaticParams() {
-  return withCaseStudy.map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await getProjects()).filter((p) => p.caseStudy).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/work/[slug]">): Promise<Metadata> {
-  const project = getProject((await params).slug);
+  const project = await getProject((await params).slug);
   if (!project?.caseStudy) notFound();
   return {
     title: `${project.title} — Case study`,
@@ -29,17 +29,19 @@ export async function generateMetadata({ params }: PageProps<"/work/[slug]">): P
 }
 
 /** The next project in the list that has a case study; otherwise the next project at all. */
-function nextProject(current: Project) {
+function nextProject(current: Project, projects: Project[]) {
   const start = projects.indexOf(current);
   const after = [...projects.slice(start + 1), ...projects.slice(0, start)];
   return after.find((p) => p.caseStudy) ?? after.find((p) => !p.soon) ?? null;
 }
 
 export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]">) {
-  const project = getProject((await params).slug);
-  if (!project?.caseStudy) notFound();
+  const { slug } = await params;
+  const [projects, body] = await Promise.all([getProjects(), getCaseStudyBody(slug)]);
+  const project = projects.find((p) => p.slug === slug);
+  if (!project?.caseStudy || !body) notFound();
   const study = project.caseStudy;
-  const next = nextProject(project);
+  const next = nextProject(project, projects);
   const slides = project.slides ?? [{}, { hero: 120 }, { hero: 64 }];
   const stageStyle = { "--bg": project.palette.bg } as CSSProperties;
 
@@ -108,26 +110,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/work/[slug]"
           </div>
         </div>
 
-        <section className={styles.story} aria-label="Story">
-          {study.sections.map((section, i) => (
-            <div key={section.title} className={styles.chapter} data-reveal="">
-              <h2 className={styles.chapterTitle}>
-                {String(i + 1).padStart(2, "0")} — {section.title}
-              </h2>
-              {section.body && <p className={styles.chapterBody}>{section.body}</p>}
-              {section.items && (
-                <ul className={styles.items}>
-                  {section.items.map((item, j) => (
-                    <li key={item}>
-                      <span>{String.fromCharCode(65 + j)}</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </section>
+        <Story body={body} />
 
         <div className={styles.figures}>
           {study.figures.map((caption, i) => (

@@ -7,6 +7,7 @@ import localFont from "next/font/local";
 
 import { SiteFooter } from "@/app/components/site/SiteFooter";
 import { SiteHeader } from "@/app/components/site/SiteHeader";
+import { getProjectCounts } from "@/lib/content";
 import { siteConfig } from "@/lib/site";
 
 const defaultTitle = `${siteConfig.name} – ${siteConfig.jobTitle}`;
@@ -75,7 +76,7 @@ export const viewport: Viewport = {
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree", display: "swap" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const jetbrainsMono = localFont({
-  src: "../public/fonts/JetBrainsMono-Variable.woff2",
+  src: "../../public/fonts/JetBrainsMono-Variable.woff2",
   variable: "--font-jetbrains",
   display: "swap",
 });
@@ -83,7 +84,8 @@ const jetbrainsMono = localFont({
 // Lets CSS hide what the page animates in, only once JS is known to be running.
 const jsFlag = "document.documentElement.classList.add('js')";
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const counts = await getProjectCounts();
   return (
     <html
       lang="en"
@@ -94,7 +96,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: jsFlag }} />
       </head>
       <body>
-        <SiteHeader />
+        <SiteHeader counts={counts} />
         <main>{children}</main>
         <SiteFooter />
         <SpeedInsights />

@@ -103,7 +103,8 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
       if (flip && media) {
         gsap.set(show, { transformOrigin: flip.transformOrigin });
         gsap.from(show, { x: flip.x, y: flip.y, scale: flip.scale, duration: 0.75, ease: ease.expo, clearProps: "transform" });
-        gsap.from(extrasOf(show), { opacity: 0, duration: 0.4, delay: 0.1, ease: "power2.out" });
+        const extras = extrasOf(show);
+        if (extras.length) gsap.from(extras, { opacity: 0, duration: 0.4, delay: 0.1, ease: "power2.out" });
         gsap.set(morph, { ...boxOf(media), opacity: 1 });
         gsap.to(morph, { ...boxOf(rootRef.current!), duration: 0.75, ease: ease.expo });
         gsap.to(morph, { opacity: 0, duration: 0.45, delay: 0.15, ease: "power1.inOut" });
@@ -184,7 +185,8 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
     if (flip && media) {
       gsap.set(show, { transformOrigin: flip.transformOrigin });
       tl.to(show, { x: flip.x, y: flip.y, scale: flip.scale, duration: 0.45, ease: ease.inOut }, 0);
-      tl.to(extrasOf(show), { opacity: 0, duration: 0.2 }, 0);
+      const extras = extrasOf(show);
+      if (extras.length) tl.to(extras, { opacity: 0, duration: 0.2 }, 0);
       tl.fromTo(morph, boxOf(root), { ...boxOf(media), duration: 0.45, ease: ease.inOut }, 0);
       tl.fromTo(morph, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power1.out" }, 0);
     } else {

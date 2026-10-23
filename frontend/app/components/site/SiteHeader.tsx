@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
 
 import { GitHub, LinkedIn, XLogo } from "@/app/components/icons";
-import { parseFilter, projectCount, type Filter } from "@/lib/projects";
+import { parseFilter, type Filter, type ProjectCounts } from "@/lib/projects";
 import { siteConfig } from "@/lib/site";
 import { useBamakoClock } from "@/lib/useBamakoClock";
 
@@ -19,7 +19,7 @@ const tabs: { filter: Filter; label: string; href: string }[] = [
 
 type Current = Filter | "about" | null;
 
-function Nav({ current }: { current: Current }) {
+function Nav({ current, counts }: { current: Current; counts: ProjectCounts }) {
   return (
     <nav className={styles.nav} aria-label="Primary">
       {tabs.map((tab) => (
@@ -31,7 +31,7 @@ function Nav({ current }: { current: Current }) {
           aria-current={current === tab.filter ? "page" : undefined}
         >
           {tab.label}
-          <span className={styles.tabCount}>{projectCount(tab.filter)}</span>
+          <span className={styles.tabCount}>{counts[tab.filter]}</span>
         </Link>
       ))}
       <Link href="/about" className={styles.tab} aria-current={current === "about" ? "page" : undefined}>
@@ -42,11 +42,11 @@ function Nav({ current }: { current: Current }) {
 }
 
 // Reads the query string, so it renders inside a Suspense boundary.
-function CurrentNav() {
+function CurrentNav({ counts }: { counts: ProjectCounts }) {
   const pathname = usePathname();
   const filter = parseFilter(useSearchParams().get("filter"));
   const current: Current = pathname === "/" ? filter : pathname.startsWith("/about") ? "about" : null;
-  return <Nav current={current} />;
+  return <Nav current={current} counts={counts} />;
 }
 
 function LocalTime() {
@@ -65,7 +65,7 @@ const socialIcons = {
   LinkedIn: <LinkedIn size={15} />,
 } as const;
 
-export function SiteHeader() {
+export function SiteHeader({ counts }: { counts: ProjectCounts }) {
   const ref = useRef<HTMLElement>(null);
 
   // The glass background comes in as soon as the page moves, so nothing slides under a bare
@@ -87,8 +87,8 @@ export function SiteHeader() {
   return (
     <header ref={ref} className={styles.header}>
       <LocalTime />
-      <Suspense fallback={<Nav current={null} />}>
-        <CurrentNav />
+      <Suspense fallback={<Nav current={null} counts={counts} />}>
+        <CurrentNav counts={counts} />
       </Suspense>
       <div className={styles.end}>
         <a href={`mailto:${siteConfig.email}`} className={styles.cta}>

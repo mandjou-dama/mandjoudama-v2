@@ -5,7 +5,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Expand } from "@/app/components/icons";
 import { ease, gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { gridItems, mediaRatio, parseFilter, projectCount, type Filter, type GridItem, type Project } from "@/lib/projects";
+import {
+  filterGrid,
+  mediaRatio,
+  parseFilter,
+  type Filter,
+  type GridItem,
+  type Project,
+  type ProjectCounts,
+} from "@/lib/projects";
 
 import { Lightbox } from "./Lightbox";
 import { ProjectCard, type OpenRequest } from "./ProjectCard";
@@ -41,13 +49,19 @@ function GridCard({ item, onOpen }: { item: GridItem; onOpen: (request: OpenRequ
   );
 }
 
+type Props = {
+  /** The whole home grid, in order (from the server, see lib/content.ts). */
+  grid: GridItem[];
+  counts: ProjectCounts;
+};
+
 /** The grid for the current ?filter=. Reads the query, so it needs a Suspense boundary. */
-export function WorkGridFromQuery() {
-  return <WorkGrid filter={parseFilter(useSearchParams().get("filter"))} />;
+export function WorkGridFromQuery(props: Props) {
+  return <WorkGrid {...props} filter={parseFilter(useSearchParams().get("filter"))} />;
 }
 
-export function WorkGrid({ filter }: { filter: Filter }) {
-  const items = useMemo(() => gridItems(filter), [filter]);
+export function WorkGrid({ grid, counts, filter }: Props & { filter: Filter }) {
+  const items = useMemo(() => filterGrid(grid, filter), [grid, filter]);
   const openable = useMemo(
     () => items.flatMap((item) => (item.type === "project" && !item.project.soon ? [item.project] : [])),
     [items],
@@ -129,7 +143,7 @@ export function WorkGrid({ filter }: { filter: Filter }) {
         <h2 id="work-heading" className={styles.heading}>
           Selected work
         </h2>
-        <span className={styles.count}>{projectCount(filter)} projects · 2023 — 2026</span>
+        <span className={styles.count}>{counts[filter]} projects · 2023 — 2026</span>
       </div>
 
       {columns ? (

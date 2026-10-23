@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Contact } from "@/app/components/home/Contact";
 import { Hero } from "@/app/components/home/Hero";
 import { WorkGrid, WorkGridFromQuery } from "@/app/components/work/WorkGrid";
+import { getGrid, getProjectCounts } from "@/lib/content";
 import { experiences, stacks } from "@/lib/profile";
 import { siteConfig } from "@/lib/site";
 
@@ -50,7 +51,8 @@ const jsonLd = {
   ],
 };
 
-export default function Page() {
+export default async function Page() {
+  const [grid, counts] = await Promise.all([getGrid(), getProjectCounts()]);
   return (
     <>
       <script
@@ -61,8 +63,8 @@ export default function Page() {
       />
       <Hero />
       {/* The grid reads ?filter= on the client, which keeps this page static; the fallback is the full grid. */}
-      <Suspense fallback={<WorkGrid filter="all" />}>
-        <WorkGridFromQuery />
+      <Suspense fallback={<WorkGrid grid={grid} counts={counts} filter="all" />}>
+        <WorkGridFromQuery grid={grid} counts={counts} />
       </Suspense>
       <Contact />
     </>
