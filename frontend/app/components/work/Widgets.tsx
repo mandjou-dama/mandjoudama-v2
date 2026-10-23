@@ -70,11 +70,10 @@ export function MusicCard() {
 
   return (
     <article className={styles.card} data-reveal="">
-      <div className={[styles.media, styles.musicStage].join(" ")} style={square}>
-        <span className={styles.overline}>{statusLabel(track)}</span>
+      <div className={styles.media} style={square}>
         <div className={styles.artwork}>
           {track?.artwork ? (
-            <Image src={track.artwork} alt={`${track.title} by ${track.artist}`} fill sizes="200px" unoptimized />
+            <Image src={track.artwork} alt={`${track.title} by ${track.artist}`} fill sizes="400px" unoptimized />
           ) : (
             <Music size={44} strokeWidth={1.6} />
           )}
@@ -82,8 +81,11 @@ export function MusicCard() {
       </div>
       <div className={styles.label}>
         <div className={styles.labelInner}>
-          <div className={styles.labelRow}>
-            <h3 className={styles.title}>{label}</h3>
+          <div className={[styles.labelRow, styles.musicRow].join(" ")}>
+            <div className={styles.musicText}>
+              <h3 className={styles.title}>{label}</h3>
+              <span className={styles.musicStatus}>{statusLabel(track)}</span>
+            </div>
             {track?.live && <Equalizer />}
           </div>
         </div>
