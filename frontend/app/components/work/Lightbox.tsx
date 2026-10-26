@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 
@@ -21,6 +22,9 @@ type Props = {
 };
 
 type FlipVars = { x: number; y: number; scale: number; transformOrigin: string };
+
+/** The real picture a thumbnail shows: the project's image or its video's poster. Mockups get a drawn outline. */
+const thumbPicture = (project: Project) => (project.media?.type === "image" ? project.media.src : project.media?.poster);
 
 const visibleAnchor = (show: HTMLElement) =>
   [...show.querySelectorAll<HTMLElement>("[data-anchor]")].find((el) => el.offsetWidth > 0);
@@ -77,6 +81,8 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
   const morphImageRef = useRef<HTMLImageElement>(null);
   const topRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const thumbsRef = useRef<HTMLDivElement>(null);
+  const thumbsShown = useRef(false);
   const hidden = useRef<HTMLElement | null>(null);
   const closing = useRef(false);
   const swipe = useRef<{ x: number; y: number; moved: boolean } | null>(null);
@@ -179,6 +185,18 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
     },
     { scope: rootRef, dependencies: [index, headIndex] },
   );
+
+  // When the strip overflows (phones), it scrolls to keep the active thumbnail centred under its sliding ring.
+  useEffect(() => {
+    const strip = thumbsRef.current;
+    const thumb = strip?.querySelectorAll("button")[index];
+    if (!strip || !thumb) return;
+    const s = strip.getBoundingClientRect();
+    const t = thumb.getBoundingClientRect();
+    const left = strip.scrollLeft + t.left - s.left - (s.width - t.width) / 2;
+    strip.scrollTo({ left, behavior: thumbsShown.current && !reducedMotion() ? "smooth" : "instant" });
+    thumbsShown.current = true;
+  }, [index]);
 
   // Close: the device flies back into its card while the picture box shrinks back around it,
   // landing exactly on the card's picture, which then takes over (or everything fades).
@@ -398,20 +416,32 @@ export function Lightbox({ projects, index, onIndexChange, getOrigin, onClose }:
             {project.cta.label}
             <ArrowUpRight size={15} />
           </CtaLink>
-          <div className={styles.thumbs}>
-            {projects.map((p, i) => (
-              <button
-                key={p.slug}
-                type="button"
-                className={styles.thumb}
-                style={{ "--bg": p.palette.bg, "--screen": p.palette.screen } as CSSProperties}
-                aria-label={`Show ${p.title}`}
-                aria-current={i === index ? "true" : undefined}
-                onClick={() => pick(i)}
-              >
-                <span className={p.device === "phone" ? styles.thumbPhone : styles.thumbBrowser} />
-              </button>
-            ))}
+          <div ref={thumbsRef} className={styles.thumbs}>
+            <div className={styles.track} style={{ "--active": index } as CSSProperties}>
+              {projects.map((p, i) => {
+                const picture = thumbPicture(p);
+                return (
+                  <button
+                    key={p.slug}
+                    type="button"
+                    className={styles.thumb}
+                    style={{ "--bg": pictureColor(p), "--screen": p.palette.screen } as CSSProperties}
+                    aria-label={`Show ${p.title}`}
+                    aria-current={i === index ? "true" : undefined}
+                    onClick={() => pick(i)}
+                  >
+                    {picture ? (
+                      <span className={styles.thumbPicture}>
+                        <Image src={picture} alt="" fill sizes="72px" />
+                      </span>
+                    ) : (
+                      <span className={p.device === "phone" ? styles.thumbPhone : styles.thumbBrowser} />
+                    )}
+                  </button>
+                );
+              })}
+              <span className={styles.thumbRing} aria-hidden="true" />
+            </div>
           </div>
         </footer>
       </div>
