@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**": ["./content/**/*"],
   },
+  // In GitHub mode Keystatic moves the local admin from localhost to 127.0.0.1, its OAuth callback host. The
+  // dev server blocks dev resources (HMR) for other origins by default, and the admin then never renders.
+  allowedDevOrigins: ["127.0.0.1"],
 };
 
 export default nextConfig;
