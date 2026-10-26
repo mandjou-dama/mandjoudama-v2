@@ -1,0 +1,25 @@
+items:
+  - discriminant: project
+    value: kori-pay
+  - discriminant: project
+    value: maison-amoa
+  - discriminant: music
+  - discriminant: project
+    value: dily
+  - discriminant: project
+    value: bamako-art-gallery
+  - discriminant: project
+    value: treize
+  - discriminant: project
+    value: o-bambu-app
+  - discriminant: time
+  - discriminant: project
+    value: yumi
+  - discriminant: project
+    value: o-bambu-web
+  - discriminant: project
+    value: kabakoo-app
+  - discriminant: project
+    value: kabakoo-academies
+  - discriminant: project
+    value: coolfaces
