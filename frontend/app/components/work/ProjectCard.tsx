@@ -4,12 +4,13 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 
 import { CtaLink } from "@/app/components/CtaLink";
-import { ChevronsLeftRight, Expand, Pause, Play } from "@/app/components/icons";
-import { BrowserMockup, DatedPhoneMockup, PhoneMockup } from "@/app/components/mockups/Mockups";
+import { Expand, Pause, Play } from "@/app/components/icons";
+import { BrowserMockup, PhoneMockup } from "@/app/components/mockups/Mockups";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { mediaRatio, pictureColor, type Project } from "@/lib/projects";
 
 import styles from "./Card.module.scss";
+import { Compare } from "./Compare";
 
 export type OpenRequest = { origin: HTMLElement; trigger: HTMLElement };
 
@@ -154,32 +155,7 @@ export function ProjectCard({ project, onOpen }: Props) {
           )}
         </div>
 
-        {isCompare && !project.media && (
-          <>
-            <div className={styles.beforeLayer}>
-              <DatedPhoneMockup project={project} className={styles.devicePhone} />
-            </div>
-            <span className={styles.divider} aria-hidden="true" />
-            <span className={[styles.tag, styles.tagBefore].join(" ")} aria-hidden="true">
-              Before
-            </span>
-            <span className={[styles.tag, styles.tagAfter].join(" ")} aria-hidden="true">
-              After
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              defaultValue={50}
-              className={styles.range}
-              aria-label={`Compare the old and new ${project.title} designs`}
-              onChange={(e) => mediaRef.current?.style.setProperty("--pos", `${e.currentTarget.value}%`)}
-            />
-            <span className={styles.handle} aria-hidden="true">
-              <ChevronsLeftRight size={16} />
-            </span>
-          </>
-        )}
+        {isCompare && !project.media && <Compare project={project} />}
 
         {openable && (
           <>
